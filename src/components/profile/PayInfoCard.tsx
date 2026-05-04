@@ -66,7 +66,7 @@ export default function PayInfoCard({
         badge={
           <span
             className="text-[9px] px-1.5 py-0.5 rounded font-medium uppercase tracking-wider"
-            style={{ backgroundColor: '#DDE8C4', color: '#3F5320', fontFamily: FONTS.sans }}
+            style={{ backgroundColor: '#E5E5E5', color: '#0A0A0A', fontFamily: FONTS.sans }}
           >
             Verified
           </span>

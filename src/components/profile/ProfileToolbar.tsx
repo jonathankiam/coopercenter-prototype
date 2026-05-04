@@ -24,7 +24,7 @@ export default function ProfileToolbar({ tenure, onEdit, onExport }: ProfileTool
         </div>
         <span
           className="flex items-center gap-1.5 text-[10px] px-2 py-0.5 rounded-full font-medium uppercase tracking-[0.1em]"
-          style={{ backgroundColor: '#DDE8C4', color: '#3F5320', fontFamily: FONTS.sans }}
+          style={{ backgroundColor: '#E5E5E5', color: '#0A0A0A', fontFamily: FONTS.sans }}
         >
           <BadgeCheck size={10} strokeWidth={2.5} />
           Active · {tenure}

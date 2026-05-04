@@ -126,7 +126,7 @@ function DayBand({ day, jobs, today, colTemplate, onAddDay, onRowMenu }: DayBand
       <div
         className="flex items-center justify-between px-5 py-2"
         style={{
-          backgroundColor: isToday ? '#F0EAD8' : C.paper,
+          backgroundColor: isToday ? '#FAFAFA' : C.paper,
           borderBottom: `1px solid ${C.borderSoft}`,
         }}
       >
@@ -321,7 +321,7 @@ function EntryRow({ entry, jobs, colTemplate, onRowMenu }: EntryRowProps) {
         {hasOT && (
           <span
             className="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded font-medium"
-            style={{ backgroundColor: '#F5E5C5', color: '#8A6420', fontFamily: FONTS.sans }}
+            style={{ backgroundColor: '#F0F0F0', color: '#404040', fontFamily: FONTS.sans }}
           >
             +{entry.otH.toFixed(1)} OT
           </span>
@@ -329,7 +329,7 @@ function EntryRow({ entry, jobs, colTemplate, onRowMenu }: EntryRowProps) {
         {hasDT && (
           <span
             className="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded font-medium"
-            style={{ backgroundColor: '#F0CFC5', color: '#7A2A1A', fontFamily: FONTS.sans }}
+            style={{ backgroundColor: '#E5E5E5', color: '#0A0A0A', fontFamily: FONTS.sans }}
           >
             +{entry.dtH.toFixed(1)} DT
           </span>

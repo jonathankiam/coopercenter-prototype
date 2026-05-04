@@ -46,8 +46,8 @@ export default function SecurityCard({
           <span
             className="text-[9px] px-1.5 py-0.5 rounded font-medium uppercase tracking-wider"
             style={{
-              backgroundColor: twoFactorEnabled ? '#DDE8C4' : '#F5E5C5',
-              color: twoFactorEnabled ? '#3F5320' : '#8A6420',
+              backgroundColor: twoFactorEnabled ? '#E5E5E5' : '#F0F0F0',
+              color: twoFactorEnabled ? '#0A0A0A' : '#404040',
               fontFamily: FONTS.sans,
             }}
           >

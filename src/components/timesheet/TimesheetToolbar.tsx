@@ -14,9 +14,9 @@ interface TimesheetToolbarProps {
 }
 
 const TIMING_BADGE: Record<WeekTimingState, { label: string; bg: string; color: string }> = {
-  current:  { label: 'Current period', bg: '#D4FF3F', color: '#1A1612' },
-  past:     { label: 'Past period',    bg: '#EFEBE2', color: '#8B8275' },
-  future:   { label: 'Upcoming',       bg: '#EFEBE2', color: '#8B8275' },
+  current:  { label: 'Current period', bg: '#0A0A0A', color: '#0A0A0A' },
+  past:     { label: 'Past period',    bg: '#F5F5F5', color: '#737373' },
+  future:   { label: 'Upcoming',       bg: '#F5F5F5', color: '#737373' },
 };
 
 export default function TimesheetToolbar({

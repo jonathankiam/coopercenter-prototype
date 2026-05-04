@@ -116,11 +116,11 @@ export default function ExpensesSubmitFooter({
         <span
           className="flex items-center gap-2 text-[12px] px-3 h-10 rounded-full"
           style={{
-            backgroundColor: '#DDE8C4',
-            color: '#3F5320',
+            backgroundColor: '#E5E5E5',
+            color: '#0A0A0A',
             fontFamily: FONTS.sans,
             fontWeight: 500,
-            border: '1px solid #C7D8AC',
+            border: '1px solid #D4D4D4',
           }}
         >
           <Check size={13} strokeWidth={2.5} />

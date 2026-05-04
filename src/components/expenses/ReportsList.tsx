@@ -341,8 +341,8 @@ function LineItemRow({ item, locked, onMenu, onReceiptClick }: LineItemRowProps)
       <div
         className="flex items-center gap-1.5 text-[11px] uppercase tracking-wider px-2 py-0.5 rounded w-fit"
         style={{
-          backgroundColor: isMileage ? '#E5EFE5' : C.bone,
-          color: isMileage ? '#3F5320' : C.inkSoft,
+          backgroundColor: isMileage ? '#F5F5F5' : C.bone,
+          color: isMileage ? '#0A0A0A' : C.inkSoft,
           fontFamily: FONTS.sans,
         }}
       >

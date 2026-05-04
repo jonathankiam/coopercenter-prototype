@@ -36,8 +36,8 @@ export default function AssignmentsCard({ jobs }: AssignmentsCardProps) {
               <span
                 className="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded font-medium"
                 style={{
-                  backgroundColor: job.kind === 'live' ? '#F5E5C5' : C.bone,
-                  color: job.kind === 'live' ? '#8A6420' : C.inkSoft,
+                  backgroundColor: job.kind === 'live' ? '#F0F0F0' : C.bone,
+                  color: job.kind === 'live' ? '#404040' : C.inkSoft,
                   fontFamily: FONTS.sans,
                 }}
               >
