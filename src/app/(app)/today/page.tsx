@@ -1,5 +1,4 @@
 import { getJobs, getEntriesForDate, getEntriesForWeek, getCurrentUser } from '@/lib/data';
-import { C, FONTS } from '@/lib/design';
 import StatsBar from '@/components/today/StatsBar';
 import ActiveAssignmentCard from '@/components/today/ActiveAssignmentCard';
 import EntriesList from '@/components/today/EntriesList';
@@ -29,18 +28,11 @@ export default async function TodayPage() {
   return (
     <div className="min-h-screen px-10 py-8 max-w-[1400px] mx-auto">
       <header className="mb-7">
-        <div
-          className="text-[11px] uppercase tracking-[0.25em]"
-          style={{ color: C.muted, fontFamily: FONTS.sans }}
-        >
+        <div className="text-[11px] uppercase tracking-[0.25em] text-muted-foreground">
           {dateLabel}
         </div>
-        <h1
-          className="text-[36px] mt-1 tracking-tight"
-          style={{ color: C.ink, fontFamily: FONTS.serif }}
-        >
-          <span style={{ fontStyle: 'italic' }}>{greeting},</span>{' '}
-          <span>{user.name}</span>
+        <h1 className="text-3xl font-semibold mt-1 tracking-tight">
+          {greeting}, {user.name}
         </h1>
       </header>
 

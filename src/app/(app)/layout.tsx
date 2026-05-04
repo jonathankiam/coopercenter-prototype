@@ -1,14 +1,16 @@
 import Sidebar from '@/components/Sidebar';
 import { getCurrentUser } from '@/lib/data';
-import { C } from '@/lib/design';
+import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const user = await getCurrentUser();
 
   return (
-    <div className="min-h-screen flex" style={{ backgroundColor: C.bone }}>
+    <SidebarProvider defaultOpen>
       <Sidebar user={user} />
-      <main className="flex-1 ml-[240px]">{children}</main>
-    </div>
+      <SidebarInset>
+        <main className="flex-1">{children}</main>
+      </SidebarInset>
+    </SidebarProvider>
   );
 }
