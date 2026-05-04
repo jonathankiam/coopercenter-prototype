@@ -1,7 +1,10 @@
 'use client';
 
 import { ChevronLeft, ChevronRight, Download, Printer } from 'lucide-react';
-import { C, FONTS } from '@/lib/design';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Card } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
 import type { WeekTimingState } from '@/lib/timesheet';
 
 interface TimesheetToolbarProps {
@@ -13,10 +16,16 @@ interface TimesheetToolbarProps {
   onToday: () => void;
 }
 
-const TIMING_BADGE: Record<WeekTimingState, { label: string; bg: string; color: string }> = {
-  current:  { label: 'Current period', bg: '#0A0A0A', color: '#0A0A0A' },
-  past:     { label: 'Past period',    bg: '#F5F5F5', color: '#737373' },
-  future:   { label: 'Upcoming',       bg: '#F5F5F5', color: '#737373' },
+const TIMING_LABEL: Record<WeekTimingState, string> = {
+  current: 'Current period',
+  past: 'Past period',
+  future: 'Upcoming',
+};
+
+const TIMING_VARIANT: Record<WeekTimingState, 'default' | 'secondary' | 'outline'> = {
+  current: 'default',
+  past: 'secondary',
+  future: 'outline',
 };
 
 export default function TimesheetToolbar({
@@ -27,97 +36,69 @@ export default function TimesheetToolbar({
   onNext,
   onToday,
 }: TimesheetToolbarProps) {
-  const badge = TIMING_BADGE[timing];
-
   return (
-    <div
-      className="flex items-center justify-between gap-4 px-5 py-3 rounded-2xl mb-3"
-      style={{ backgroundColor: C.cream, border: `1px solid ${C.border}` }}
-    >
+    <Card className="flex-row items-center justify-between gap-4 px-5 py-3 mb-3 shadow-none">
       <div className="flex items-center gap-3 min-w-0">
-        <div
-          className="text-[10px] uppercase tracking-[0.2em]"
-          style={{ color: C.muted, fontFamily: FONTS.sans }}
-        >
+        <span className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
           Pay period
-        </div>
-        <div
-          className="text-[15px] font-medium tabular-nums"
-          style={{ color: C.ink, fontFamily: FONTS.sans }}
-        >
-          {weekStartLabel} <span style={{ color: C.muted, margin: '0 6px' }}>—</span> {weekEndLabel}
-        </div>
-        <span
-          className="text-[10px] px-2 py-0.5 rounded-full font-medium uppercase tracking-[0.1em]"
-          style={{ backgroundColor: badge.bg, color: badge.color, fontFamily: FONTS.sans }}
-        >
-          {badge.label}
         </span>
+        <span className="text-[15px] font-medium font-mono tabular-nums text-foreground">
+          {weekStartLabel}
+          <span className="mx-1.5 text-muted-foreground">—</span>
+          {weekEndLabel}
+        </span>
+        <Badge
+          variant={TIMING_VARIANT[timing]}
+          className="text-[10px] uppercase tracking-[0.1em]"
+        >
+          {TIMING_LABEL[timing]}
+        </Badge>
       </div>
 
       <div className="flex items-center gap-2">
-        <div
-          className="flex items-center rounded-full p-0.5"
-          style={{ backgroundColor: C.bone, border: `1px solid ${C.borderSoft}` }}
-        >
-          <button
+        <div className="flex items-center rounded-md border bg-muted/40 p-0.5">
+          <Button
+            variant="ghost"
+            size="icon-sm"
             onClick={onPrev}
-            className="w-8 h-8 rounded-full flex items-center justify-center transition-colors hover:bg-white/40"
             aria-label="Previous week"
           >
-            <ChevronLeft size={14} style={{ color: C.ink }} />
-          </button>
-          <button
+            <ChevronLeft size={14} />
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
             onClick={onToday}
-            className="px-3 h-8 rounded-full transition-colors hover:bg-white/40"
-            style={{
-              color: timing === 'current' ? C.muted : C.ink,
-              fontFamily: FONTS.sans,
-              fontSize: 12,
-              fontWeight: 600,
-              letterSpacing: '0.05em',
-            }}
             disabled={timing === 'current'}
+            className="uppercase tracking-[0.05em]"
           >
             Today
-          </button>
-          <button
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon-sm"
             onClick={onNext}
-            className="w-8 h-8 rounded-full flex items-center justify-center transition-colors hover:bg-white/40"
             aria-label="Next week"
           >
-            <ChevronRight size={14} style={{ color: C.ink }} />
-          </button>
+            <ChevronRight size={14} />
+          </Button>
         </div>
 
-        <button
-          className="flex items-center gap-1.5 h-9 px-3 rounded-full transition-colors hover:opacity-90"
-          style={{
-            backgroundColor: C.bone,
-            border: `1px solid ${C.borderSoft}`,
-            color: C.inkSoft,
-            fontFamily: FONTS.sans,
-            fontSize: 12,
-            fontWeight: 500,
-          }}
-          title="Export this pay period"
-        >
+        <Separator orientation="vertical" className="h-6" />
+
+        <Button variant="outline" size="sm" title="Export this pay period">
           <Download size={13} strokeWidth={2.2} />
           Export
-        </button>
-        <button
-          className="w-9 h-9 rounded-full flex items-center justify-center transition-colors hover:opacity-90"
-          style={{
-            backgroundColor: C.bone,
-            border: `1px solid ${C.borderSoft}`,
-            color: C.inkSoft,
-          }}
+        </Button>
+        <Button
+          variant="outline"
+          size="icon-sm"
           title="Print timecard"
           aria-label="Print"
         >
           <Printer size={13} strokeWidth={2.2} />
-        </button>
+        </Button>
       </div>
-    </div>
+    </Card>
   );
 }

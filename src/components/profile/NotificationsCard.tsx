@@ -1,9 +1,9 @@
 'use client';
 
 import { Bell } from 'lucide-react';
-import SettingsCard from './SettingsCard';
-import Toggle from '@/components/Toggle';
-import { C, FONTS } from '@/lib/design';
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
+import { Switch } from '@/components/ui/switch';
+import { Separator } from '@/components/ui/separator';
 
 export type NotificationKey =
   | 'timecardReminders'
@@ -37,38 +37,36 @@ export default function NotificationsCard({ prefs, onChange }: NotificationsCard
   const enabledCount = Object.values(prefs).filter(Boolean).length;
 
   return (
-    <SettingsCard
-      icon={Bell}
-      title="Notifications"
-      description={`${enabledCount} of ${ROWS.length} enabled · sent via email and push.`}
-    >
-      {ROWS.map((r) => (
-        <div
-          key={r.key}
-          className="grid grid-cols-[1fr_auto] items-center gap-4 px-5 py-3.5"
-          style={{ borderBottom: `1px solid ${C.borderSoft}` }}
-        >
-          <div>
-            <div
-              className="text-[13px] font-medium"
-              style={{ color: C.ink, fontFamily: FONTS.sans }}
-            >
-              {r.label}
-            </div>
-            <div
-              className="text-[11px] mt-0.5"
-              style={{ color: C.muted, fontFamily: FONTS.sans }}
-            >
-              {r.description}
+    <Card className="shadow-none">
+      <CardHeader>
+        <div className="flex items-center gap-2">
+          <Bell size={16} className="text-muted-foreground" />
+          <CardTitle>Notifications</CardTitle>
+        </div>
+        <CardDescription>
+          {enabledCount} of {ROWS.length} enabled · sent via email and push.
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="px-0">
+        {ROWS.map((r, idx) => (
+          <div key={r.key}>
+            {idx > 0 && <Separator />}
+            <div className="grid grid-cols-[1fr_auto] items-center gap-4 px-6 py-3.5">
+              <div>
+                <div className="text-[13px] font-medium">{r.label}</div>
+                <div className="text-[11px] mt-0.5 text-muted-foreground">
+                  {r.description}
+                </div>
+              </div>
+              <Switch
+                checked={prefs[r.key]}
+                onCheckedChange={(v) => onChange(r.key, v)}
+                aria-label={r.label}
+              />
             </div>
           </div>
-          <Toggle
-            checked={prefs[r.key]}
-            onChange={(v) => onChange(r.key, v)}
-            label={r.label}
-          />
-        </div>
-      ))}
-    </SettingsCard>
+        ))}
+      </CardContent>
+    </Card>
   );
 }

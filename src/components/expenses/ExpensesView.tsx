@@ -1,7 +1,6 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { C, FONTS } from '@/lib/design';
 import {
   buildReportSummaries,
   filterReports,
@@ -85,18 +84,12 @@ export default function ExpensesView({
 
   return (
     <div className="min-h-screen px-10 py-8 max-w-[1500px] mx-auto pb-24">
-      <header className="mb-5">
-        <div
-          className="text-[11px] uppercase tracking-[0.25em]"
-          style={{ color: C.muted, fontFamily: FONTS.sans }}
-        >
+      <header className="mb-6">
+        <div className="text-[11px] uppercase tracking-[0.25em] text-muted-foreground">
           Expenses
         </div>
-        <h1
-          className="text-[32px] mt-1 tracking-tight leading-tight"
-          style={{ color: C.ink, fontFamily: FONTS.serif }}
-        >
-          <span style={{ fontStyle: 'italic' }}>Reports & reimbursements</span>
+        <h1 className="text-3xl font-semibold mt-1 tracking-tight">
+          Reports & reimbursements
         </h1>
       </header>
 

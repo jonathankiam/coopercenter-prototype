@@ -1,5 +1,7 @@
-import { C, FONTS } from '@/lib/design';
+import { Card } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
 import { fmtMoney } from '@/lib/utils';
+import { cn } from '@/lib/cn';
 import type { Breakdown } from '@/lib/utils';
 
 interface SummaryBarProps {
@@ -11,28 +13,22 @@ interface SummaryBarProps {
 interface MetricProps {
   label: string;
   value: string;
-  accent?: string;
   emphasized?: boolean;
+  muted?: boolean;
 }
 
-function Metric({ label, value, accent = C.ink, emphasized = false }: MetricProps) {
+function Metric({ label, value, emphasized = false, muted = false }: MetricProps) {
   return (
     <div className="flex flex-col">
-      <span
-        className="text-[9px] uppercase tracking-[0.18em]"
-        style={{ color: C.muted, fontFamily: FONTS.sans }}
-      >
+      <span className="text-[9px] uppercase tracking-[0.18em] text-muted-foreground">
         {label}
       </span>
       <span
-        className="tabular-nums leading-none mt-1"
-        style={{
-          color: accent,
-          fontFamily: FONTS.mono,
-          fontWeight: emphasized ? 500 : 400,
-          fontSize: emphasized ? 22 : 18,
-          letterSpacing: '-0.01em',
-        }}
+        className={cn(
+          'font-mono tabular-nums leading-none mt-1',
+          emphasized ? 'text-[22px] font-medium' : 'text-[18px]',
+          muted ? 'text-muted-foreground' : 'text-foreground',
+        )}
       >
         {value}
       </span>
@@ -40,42 +36,32 @@ function Metric({ label, value, accent = C.ink, emphasized = false }: MetricProp
   );
 }
 
-function Divider() {
-  return <span className="block w-px self-stretch" style={{ backgroundColor: C.borderSoft }} />;
-}
-
 export default function SummaryBar({ breakdown, earnings, entryCount }: SummaryBarProps) {
   return (
-    <div
-      className="flex items-center gap-6 px-5 py-4 rounded-2xl mb-3"
-      style={{ backgroundColor: C.cream, border: `1px solid ${C.border}` }}
-    >
+    <Card className="flex-row items-center gap-6 px-5 py-4 mb-3 shadow-none">
       <Metric label="Total" value={`${breakdown.total.toFixed(1)}h`} emphasized />
-      <Divider />
+      <Separator orientation="vertical" className="h-10" />
       <Metric label="Regular" value={`${breakdown.regular.toFixed(1)}h`} />
       <Metric
         label="Overtime · 1.5×"
         value={`${breakdown.ot.toFixed(1)}h`}
-        accent={breakdown.ot > 0 ? C.amber : C.muted}
+        muted={breakdown.ot === 0}
       />
       <Metric
         label="Double · 2×"
         value={`${breakdown.dt.toFixed(1)}h`}
-        accent={breakdown.dt > 0 ? C.clay : C.muted}
+        muted={breakdown.dt === 0}
       />
-      <Divider />
+      <Separator orientation="vertical" className="h-10" />
       <Metric label="Estimated earnings" value={fmtMoney(earnings)} emphasized />
-      <Divider />
+      <Separator orientation="vertical" className="h-10" />
       <Metric label="Entries" value={String(entryCount)} />
 
       <div className="flex-1" />
 
-      <span
-        className="text-[10px] uppercase tracking-[0.18em]"
-        style={{ color: C.mutedSoft, fontFamily: FONTS.sans }}
-      >
+      <span className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
         Daily threshold &gt;8h → OT · &gt;12h → DT
       </span>
-    </div>
+    </Card>
   );
 }

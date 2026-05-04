@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { Fragment, useState } from 'react';
 import {
   ArrowUpRight,
   Check,
@@ -13,8 +13,19 @@ import {
   Receipt,
   Car,
 } from 'lucide-react';
-import { C, FONTS } from '@/lib/design';
+import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
 import { dayLabel, dayNum, fmtMoney, monthName } from '@/lib/utils';
+import { cn } from '@/lib/cn';
 import StatusPill from '@/components/StatusPill';
 import type { ExpenseItem } from '@/lib/types';
 import type { ReportSummary } from '@/lib/expenses';
@@ -29,9 +40,6 @@ interface ReportsListProps {
   onReceiptClick?: (item: ExpenseItem) => void;
 }
 
-// Spreadsheet column template — Date / Type / Vendor or Trip / Category / Amount / Receipt / Status / actions
-const COL = '110px 90px minmax(220px, 1.4fr) 150px 110px 130px 110px 36px';
-
 export default function ReportsList({
   summaries,
   defaultExpandStatuses,
@@ -42,68 +50,63 @@ export default function ReportsList({
 }: ReportsListProps) {
   if (summaries.length === 0) {
     return (
-      <div
-        className="rounded-2xl p-12 text-center mb-6"
-        style={{ backgroundColor: C.cream, border: `1px dashed ${C.border}` }}
-      >
-        <Receipt size={22} style={{ color: C.mutedSoft, margin: '0 auto 10px' }} />
-        <div
-          className="text-[16px]"
-          style={{ color: C.muted, fontFamily: FONTS.serif, fontStyle: 'italic' }}
-        >
+      <Card className="p-12 text-center mb-6 border-dashed shadow-none">
+        <Receipt size={22} className="text-muted-foreground mx-auto mb-2.5" />
+        <div className="text-[15px] font-medium text-muted-foreground">
           No reports in this view
         </div>
-        <div
-          className="text-[11px] mt-1"
-          style={{ color: C.mutedSoft, fontFamily: FONTS.sans }}
-        >
+        <div className="text-[11px] mt-1 text-muted-foreground/70">
           Switch tabs above or add a new expense to populate a draft report.
         </div>
-      </div>
+      </Card>
     );
   }
 
   return (
-    <div
-      className="rounded-2xl overflow-hidden mb-6"
-      style={{ backgroundColor: C.cream, border: `1px solid ${C.border}` }}
-    >
-      {/* Header row */}
-      <div
-        className="grid items-center px-5 py-2.5"
-        style={{
-          gridTemplateColumns: COL,
-          backgroundColor: C.bone,
-          borderBottom: `1px solid ${C.border}`,
-          color: C.muted,
-          fontFamily: FONTS.sans,
-          fontSize: 10,
-          letterSpacing: '0.18em',
-          textTransform: 'uppercase',
-        }}
-      >
-        <span>Date</span>
-        <span>Type</span>
-        <span>Vendor · Trip · Note</span>
-        <span>Category</span>
-        <span className="text-right">Amount</span>
-        <span>Receipt</span>
-        <span>Status</span>
-        <span></span>
-      </div>
+    <Card className="overflow-hidden mb-6 py-0 shadow-none">
+      <Table>
+        <TableHeader>
+          <TableRow className="bg-muted/40 hover:bg-muted/40">
+            <TableHead className="w-[120px] px-5 text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
+              Date
+            </TableHead>
+            <TableHead className="w-[100px] text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
+              Type
+            </TableHead>
+            <TableHead className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
+              Vendor · Trip · Note
+            </TableHead>
+            <TableHead className="w-[160px] text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
+              Category
+            </TableHead>
+            <TableHead className="w-[110px] text-right text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
+              Amount
+            </TableHead>
+            <TableHead className="w-[140px] text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
+              Receipt
+            </TableHead>
+            <TableHead className="w-[120px] text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
+              Status
+            </TableHead>
+            <TableHead className="w-[44px] px-2 text-[10px] uppercase tracking-[0.18em] text-muted-foreground" />
+          </TableRow>
+        </TableHeader>
 
-      {summaries.map((s) => (
-        <ReportBand
-          key={s.report.id}
-          summary={s}
-          defaultExpanded={defaultExpandStatuses?.has(s.report.status) ?? true}
-          onSubmit={() => onSubmitReport(s.report.id)}
-          onAddItem={onAddItemToReport ? () => onAddItemToReport(s.report.id) : undefined}
-          onItemMenu={onItemMenu}
-          onReceiptClick={onReceiptClick}
-        />
-      ))}
-    </div>
+        <TableBody>
+          {summaries.map((s) => (
+            <ReportBand
+              key={s.report.id}
+              summary={s}
+              defaultExpanded={defaultExpandStatuses?.has(s.report.status) ?? true}
+              onSubmit={() => onSubmitReport(s.report.id)}
+              onAddItem={onAddItemToReport ? () => onAddItemToReport(s.report.id) : undefined}
+              onItemMenu={onItemMenu}
+              onReceiptClick={onReceiptClick}
+            />
+          ))}
+        </TableBody>
+      </Table>
+    </Card>
   );
 }
 
@@ -127,8 +130,7 @@ function ReportBand({
   onReceiptClick,
 }: ReportBandProps) {
   const [expanded, setExpanded] = useState(defaultExpanded);
-  const { report, job, items, total, mileage, itemCount } = summary;
-  const accent = job?.color ?? C.muted;
+  const { report, items, total, mileage, itemCount } = summary;
   const canSubmit = isOpenStatus(report.status);
   const submitted = !canSubmit;
 
@@ -139,100 +141,75 @@ function ReportBand({
   const sortedItems = [...items].sort((a, b) => a.date.getTime() - b.date.getTime());
 
   return (
-    <div>
+    <Fragment>
       {/* Band header */}
-      <div
-        className="flex items-center justify-between px-5 py-3"
-        style={{
-          backgroundColor: C.paper,
-          borderBottom: expanded ? `1px solid ${C.borderSoft}` : `1px solid ${C.border}`,
-        }}
-      >
-        <button
-          onClick={() => setExpanded((o) => !o)}
-          className="flex items-center gap-3 text-left flex-1 min-w-0"
-        >
-          {expanded ? (
-            <ChevronDown size={14} style={{ color: C.muted, flexShrink: 0 }} />
-          ) : (
-            <ChevronRight size={14} style={{ color: C.muted, flexShrink: 0 }} />
-          )}
-          <span
-            className="block w-1.5 h-7 rounded-full flex-shrink-0"
-            style={{ backgroundColor: accent }}
-          />
-          <div className="min-w-0">
-            <div className="flex items-baseline gap-2 flex-wrap">
-              <span
-                className="text-[14px] font-medium truncate"
-                style={{ color: C.ink, fontFamily: FONTS.sans }}
-              >
-                {report.client}
-              </span>
-              <span
-                className="text-[11px] tabular-nums"
-                style={{ color: C.muted, fontFamily: FONTS.sans }}
-              >
-                Week of {monthName(report.weekStart).slice(0, 3)} {dayNum(report.weekStart)} — {monthName(weekEnd).slice(0, 3)} {dayNum(weekEnd)}
-              </span>
-            </div>
-            <div
-              className="text-[10px] mt-0.5 tabular-nums uppercase tracking-wider"
-              style={{ color: C.mutedSoft, fontFamily: FONTS.sans }}
+      <tr className="border-b bg-muted/20">
+        <td colSpan={8} className="px-5 py-3">
+          <div className="flex items-center justify-between gap-3">
+            <button
+              onClick={() => setExpanded((o) => !o)}
+              className="flex items-center gap-3 text-left flex-1 min-w-0"
             >
-              {itemCount} {itemCount === 1 ? 'item' : 'items'}
-              {mileage > 0 && ` · ${mileage.toFixed(0)} mi`}
+              {expanded ? (
+                <ChevronDown size={14} className="text-muted-foreground flex-shrink-0" />
+              ) : (
+                <ChevronRight size={14} className="text-muted-foreground flex-shrink-0" />
+              )}
+              <span className="block w-1.5 h-7 rounded-full flex-shrink-0 bg-foreground/60" />
+              <div className="min-w-0">
+                <div className="flex items-baseline gap-2 flex-wrap">
+                  <span className="text-[14px] font-medium truncate text-foreground">
+                    {report.client}
+                  </span>
+                  <span className="text-[11px] tabular-nums text-muted-foreground">
+                    Week of {monthName(report.weekStart).slice(0, 3)} {dayNum(report.weekStart)} — {monthName(weekEnd).slice(0, 3)} {dayNum(weekEnd)}
+                  </span>
+                </div>
+                <div className="text-[10px] mt-0.5 tabular-nums uppercase tracking-wider text-muted-foreground">
+                  {itemCount} {itemCount === 1 ? 'item' : 'items'}
+                  {mileage > 0 && ` · ${mileage.toFixed(0)} mi`}
+                </div>
+              </div>
+            </button>
+
+            <div className="flex items-center gap-3 flex-shrink-0">
+              <span className="text-[16px] font-mono tabular-nums font-medium text-foreground">
+                {fmtMoney(total)}
+              </span>
+              <StatusPill status={report.status} size="md" />
+              <Button
+                onClick={onSubmit}
+                disabled={!canSubmit}
+                size="sm"
+                variant={canSubmit ? 'default' : 'outline'}
+                className={cn('rounded-full uppercase tracking-[0.05em]', !canSubmit && 'text-muted-foreground')}
+                title={
+                  submitted
+                    ? 'This report has already been submitted'
+                    : 'Submit this expense report'
+                }
+              >
+                {submitted ? (
+                  <>
+                    <Check size={11} strokeWidth={2.5} />
+                    Submitted
+                  </>
+                ) : report.status === 'rejected' ? (
+                  <>
+                    Resubmit
+                    <ArrowUpRight size={11} strokeWidth={2.5} />
+                  </>
+                ) : (
+                  <>
+                    Submit
+                    <ArrowUpRight size={11} strokeWidth={2.5} />
+                  </>
+                )}
+              </Button>
             </div>
           </div>
-        </button>
-
-        <div className="flex items-center gap-3 flex-shrink-0">
-          <span
-            className="text-[16px] tabular-nums font-medium"
-            style={{ color: C.ink, fontFamily: FONTS.mono }}
-          >
-            {fmtMoney(total)}
-          </span>
-          <StatusPill status={report.status} size="md" />
-          <button
-            onClick={onSubmit}
-            disabled={!canSubmit}
-            className="flex items-center gap-1.5 h-8 px-3 rounded-full transition-all"
-            style={{
-              backgroundColor: canSubmit ? C.lime : C.bone,
-              color: canSubmit ? C.ink : C.muted,
-              border: `1px solid ${canSubmit ? C.limeDeep : C.borderSoft}`,
-              fontFamily: FONTS.sans,
-              fontSize: 11,
-              fontWeight: 600,
-              letterSpacing: '0.05em',
-              cursor: canSubmit ? 'pointer' : 'not-allowed',
-            }}
-            title={
-              submitted
-                ? 'This report has already been submitted'
-                : 'Submit this expense report'
-            }
-          >
-            {submitted ? (
-              <>
-                <Check size={11} strokeWidth={2.5} />
-                <span className="uppercase">Submitted</span>
-              </>
-            ) : report.status === 'rejected' ? (
-              <>
-                <span className="uppercase">Resubmit</span>
-                <ArrowUpRight size={11} strokeWidth={2.5} />
-              </>
-            ) : (
-              <>
-                <span className="uppercase">Submit</span>
-                <ArrowUpRight size={11} strokeWidth={2.5} />
-              </>
-            )}
-          </button>
-        </div>
-      </div>
+        </td>
+      </tr>
 
       {/* Expanded item rows */}
       {expanded && (
@@ -248,54 +225,36 @@ function ReportBand({
           ))}
           {/* Add-item row appears only on draft/rejected reports */}
           {onAddItem && isOpenStatus(report.status) && (
-            <button
-              onClick={onAddItem}
-              className="w-full grid items-center px-5 py-2.5 transition-colors hover:bg-white/40 text-left"
-              style={{
-                gridTemplateColumns: COL,
-                borderBottom: `1px solid ${C.borderSoft}`,
-                backgroundColor: C.cream,
-                color: C.muted,
-                fontFamily: FONTS.sans,
-              }}
-            >
-              <span className="col-span-8 flex items-center gap-2 text-[12px]">
-                <Plus size={12} strokeWidth={2.4} />
-                Add a line item to this report
-              </span>
-            </button>
+            <TableRow className="hover:bg-muted/40">
+              <TableCell colSpan={8} className="px-5 py-2.5">
+                <button
+                  onClick={onAddItem}
+                  className="flex items-center gap-2 text-[12px] text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  <Plus size={12} strokeWidth={2.4} />
+                  Add a line item to this report
+                </button>
+              </TableCell>
+            </TableRow>
           )}
           {/* Subtotal row */}
-          <div
-            className="grid items-center px-5 py-2.5"
-            style={{
-              gridTemplateColumns: COL,
-              backgroundColor: C.bone,
-              borderBottom: `1px solid ${C.border}`,
-            }}
-          >
-            <span></span>
-            <span></span>
-            <span
-              className="text-[10px] uppercase tracking-[0.2em]"
-              style={{ color: C.muted, fontFamily: FONTS.sans }}
-            >
+          <TableRow className="bg-muted/40 hover:bg-muted/40">
+            <TableCell />
+            <TableCell />
+            <TableCell className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
               Subtotal · {itemCount} {itemCount === 1 ? 'item' : 'items'}
-            </span>
-            <span></span>
-            <span
-              className="text-right tabular-nums text-[14px] font-medium"
-              style={{ color: C.ink, fontFamily: FONTS.mono }}
-            >
+            </TableCell>
+            <TableCell />
+            <TableCell className="text-right font-mono tabular-nums text-[14px] font-medium text-foreground">
               {fmtMoney(total)}
-            </span>
-            <span></span>
-            <span></span>
-            <span></span>
-          </div>
+            </TableCell>
+            <TableCell />
+            <TableCell />
+            <TableCell />
+          </TableRow>
         </>
       )}
-    </div>
+    </Fragment>
   );
 }
 
@@ -320,101 +279,76 @@ function LineItemRow({ item, locked, onMenu, onReceiptClick }: LineItemRowProps)
     : item.note ?? '';
 
   return (
-    <div
-      className="grid items-center px-5 py-2.5 transition-colors group hover:bg-white/40"
-      style={{
-        gridTemplateColumns: COL,
-        borderBottom: `1px solid ${C.borderSoft}`,
-        backgroundColor: C.cream,
-        opacity: locked ? 0.85 : 1,
-      }}
-    >
+    <TableRow className={cn('group', locked && 'opacity-80')}>
       {/* Date */}
-      <span
-        className="text-[12px] tabular-nums"
-        style={{ color: C.inkSoft, fontFamily: FONTS.sans }}
-      >
+      <TableCell className="px-5 text-[12px] font-mono tabular-nums text-muted-foreground">
         {dayLabel(item.date).slice(0, 3)} {monthName(item.date).slice(0, 3)} {dayNum(item.date)}
-      </span>
+      </TableCell>
 
       {/* Type */}
-      <div
-        className="flex items-center gap-1.5 text-[11px] uppercase tracking-wider px-2 py-0.5 rounded w-fit"
-        style={{
-          backgroundColor: isMileage ? '#F5F5F5' : C.bone,
-          color: isMileage ? '#0A0A0A' : C.inkSoft,
-          fontFamily: FONTS.sans,
-        }}
-      >
-        {isMileage ? <Car size={10} strokeWidth={2.4} /> : <Receipt size={10} strokeWidth={2.4} />}
-        {isMileage ? 'Mileage' : 'Expense'}
-      </div>
+      <TableCell>
+        <Badge variant="outline" className="text-[10px] uppercase tracking-wider rounded gap-1">
+          {isMileage ? <Car size={10} strokeWidth={2.4} /> : <Receipt size={10} strokeWidth={2.4} />}
+          {isMileage ? 'Mileage' : 'Expense'}
+        </Badge>
+      </TableCell>
 
       {/* Vendor / Trip + note */}
-      <div className="min-w-0">
-        <div
-          className="text-[13px] font-medium truncate"
-          style={{ color: C.ink, fontFamily: FONTS.sans }}
-        >
-          {description}
-        </div>
-        {subDescription && (
-          <div
-            className="text-[11px] italic truncate mt-0.5"
-            style={{ color: C.muted, fontFamily: FONTS.sans }}
-          >
-            {isMileage ? subDescription : `“${subDescription}”`}
+      <TableCell>
+        <div className="min-w-0">
+          <div className="text-[13px] font-medium truncate text-foreground">
+            {description}
           </div>
-        )}
-      </div>
+          {subDescription && (
+            <div className="text-[11px] italic truncate mt-0.5 text-muted-foreground">
+              {isMileage ? subDescription : `“${subDescription}”`}
+            </div>
+          )}
+        </div>
+      </TableCell>
 
       {/* Category */}
-      <span
-        className="text-[12px] truncate"
-        style={{ color: C.inkSoft, fontFamily: FONTS.sans }}
-      >
+      <TableCell className="text-[12px] truncate text-foreground/80">
         {isMileage ? 'Mileage · IRS rate' : item.category ?? '—'}
-      </span>
+      </TableCell>
 
       {/* Amount */}
-      <span
-        className="text-right tabular-nums text-[14px] font-medium"
-        style={{ color: C.ink, fontFamily: FONTS.mono }}
-      >
+      <TableCell className="text-right font-mono tabular-nums text-[14px] font-medium text-foreground">
         {fmtMoney(item.amount)}
-      </span>
+      </TableCell>
 
       {/* Receipt */}
-      <button
-        onClick={() => onReceiptClick?.(item)}
-        className="flex items-center gap-1.5 text-left transition-colors hover:underline"
-        style={{
-          color: item.receipt ? C.inkSoft : C.mutedSoft,
-          fontFamily: FONTS.sans,
-          fontSize: 11,
-        }}
-        disabled={!item.receipt}
-        title={item.receipt ? `View ${item.receipt.label}` : 'No receipt attached'}
-      >
-        <Paperclip size={11} strokeWidth={2.2} />
-        <span className="truncate">{item.receipt?.label ?? 'Missing'}</span>
-      </button>
+      <TableCell>
+        <button
+          onClick={() => onReceiptClick?.(item)}
+          className={cn(
+            'flex items-center gap-1.5 text-left text-[11px] transition-colors hover:underline',
+            item.receipt ? 'text-foreground/80' : 'text-muted-foreground/70',
+          )}
+          disabled={!item.receipt}
+          title={item.receipt ? `View ${item.receipt.label}` : 'No receipt attached'}
+        >
+          <Paperclip size={11} strokeWidth={2.2} />
+          <span className="truncate">{item.receipt?.label ?? 'Missing'}</span>
+        </button>
+      </TableCell>
 
       {/* Status (uses parent report's status; line items inherit) */}
-      <span></span>
+      <TableCell />
 
       {/* Actions */}
-      <div className="flex justify-end">
-        <button
+      <TableCell className="px-2">
+        <Button
+          variant="ghost"
+          size="icon-sm"
           onClick={() => onMenu?.(item)}
-          className="w-7 h-7 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-white/60"
-          style={{ color: C.muted }}
+          className="opacity-0 group-hover:opacity-100 transition-opacity"
           aria-label="Row actions"
           disabled={locked}
         >
           {locked ? <Lock size={12} /> : <MoreHorizontal size={14} />}
-        </button>
-      </div>
-    </div>
+        </Button>
+      </TableCell>
+    </TableRow>
   );
 }

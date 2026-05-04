@@ -1,8 +1,20 @@
 'use client';
 
+import { Fragment } from 'react';
 import { MoreHorizontal, AlertTriangle, Lock, Plus } from 'lucide-react';
-import { C, FONTS } from '@/lib/design';
+import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
 import { dayLabel, dayNum, monthName, sameDay, isBackfilledLivePunch, computeBreakdown } from '@/lib/utils';
+import { cn } from '@/lib/cn';
 import StatusPill from '@/components/StatusPill';
 import ManualBadge from '@/components/ManualBadge';
 import type { TimeEntry, Job } from '@/lib/types';
@@ -17,10 +29,6 @@ interface TimesheetGridProps {
   onRowMenu?: (entry: TimeEntry) => void;
 }
 
-// Column template for the spreadsheet grid. Tuned so the data rows feel dense
-// without overflow at common laptop widths (1280–1440px content area).
-const COL = '120px minmax(220px, 1.4fr) 130px 70px minmax(180px, 1fr) 110px 36px';
-
 export default function TimesheetGrid({
   weekDays,
   jobs,
@@ -30,75 +38,62 @@ export default function TimesheetGrid({
   onRowMenu,
 }: TimesheetGridProps) {
   return (
-    <div
-      className="rounded-2xl overflow-hidden mb-6"
-      style={{ backgroundColor: C.cream, border: `1px solid ${C.border}` }}
-    >
-      {/* Header row */}
-      <div
-        className="grid items-center px-5 py-2.5"
-        style={{
-          gridTemplateColumns: COL,
-          backgroundColor: C.bone,
-          borderBottom: `1px solid ${C.border}`,
-          color: C.muted,
-          fontFamily: FONTS.sans,
-          fontSize: 10,
-          letterSpacing: '0.18em',
-          textTransform: 'uppercase',
-        }}
-      >
-        <span>Day</span>
-        <span>Job · Notes</span>
-        <span>Time</span>
-        <span className="text-right">Hours</span>
-        <span>Pay code · OT/DT</span>
-        <span>Status</span>
-        <span></span>
-      </div>
+    <Card className="overflow-hidden mb-6 py-0 shadow-none">
+      <Table>
+        <TableHeader>
+          <TableRow className="bg-muted/40 hover:bg-muted/40">
+            <TableHead className="w-[140px] px-5 text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
+              Day
+            </TableHead>
+            <TableHead className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
+              Job · Notes
+            </TableHead>
+            <TableHead className="w-[140px] text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
+              Time
+            </TableHead>
+            <TableHead className="w-[80px] text-right text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
+              Hours
+            </TableHead>
+            <TableHead className="w-[200px] text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
+              Pay code · OT/DT
+            </TableHead>
+            <TableHead className="w-[120px] text-[10px] uppercase tracking-[0.18em] text-muted-foreground">
+              Status
+            </TableHead>
+            <TableHead className="w-[44px] px-2 text-[10px] uppercase tracking-[0.18em] text-muted-foreground" />
+          </TableRow>
+        </TableHeader>
 
-      {/* Day bands */}
-      {weekDays.map((day) => (
-        <DayBand
-          key={day.date.toISOString()}
-          day={day}
-          jobs={jobs}
-          today={today}
-          colTemplate={COL}
-          onAddDay={onAddDay}
-          onRowMenu={onRowMenu}
-        />
-      ))}
+        <TableBody>
+          {weekDays.map((day) => (
+            <DayBand
+              key={day.date.toISOString()}
+              day={day}
+              jobs={jobs}
+              today={today}
+              onAddDay={onAddDay}
+              onRowMenu={onRowMenu}
+            />
+          ))}
+        </TableBody>
 
-      {/* Footer row — grand total */}
-      <div
-        className="grid items-center px-5 py-3"
-        style={{
-          gridTemplateColumns: COL,
-          backgroundColor: C.ink,
-          color: C.cream,
-          borderTop: `1px solid ${C.ink}`,
-        }}
-      >
-        <span
-          className="text-[10px] uppercase tracking-[0.2em]"
-          style={{ color: C.mutedSoft, fontFamily: FONTS.sans }}
-        >
-          Week total
-        </span>
-        <span></span>
-        <span></span>
-        <span
-          className="text-right tabular-nums"
-          style={{ fontFamily: FONTS.mono, fontSize: 18, color: C.lime, fontWeight: 500 }}
-        >
-          {weekTotal.toFixed(1)}h
-        </span>
-        <span></span>
-        <span></span>
-        <span></span>
-      </div>
-    </div>
+        <tfoot>
+          <tr className="bg-primary text-primary-foreground">
+            <td className="px-5 py-3 text-[10px] uppercase tracking-[0.2em] text-primary-foreground/70">
+              Week total
+            </td>
+            <td />
+            <td />
+            <td className="px-2 py-3 text-right font-mono tabular-nums text-lg font-medium">
+              {weekTotal.toFixed(1)}h
+            </td>
+            <td />
+            <td />
+            <td />
+          </tr>
+        </tfoot>
+      </Table>
+    </Card>
   );
 }
 
@@ -108,12 +103,11 @@ interface DayBandProps {
   day: WeekDay;
   jobs: Job[];
   today: Date;
-  colTemplate: string;
   onAddDay?: (date: Date) => void;
   onRowMenu?: (entry: TimeEntry) => void;
 }
 
-function DayBand({ day, jobs, today, colTemplate, onAddDay, onRowMenu }: DayBandProps) {
+function DayBand({ day, jobs, today, onAddDay, onRowMenu }: DayBandProps) {
   const isToday = sameDay(day.date, today);
   const sorted = [...day.entries].sort((a, b) => a.start.localeCompare(b.start));
   const bd = computeBreakdown(sorted);
@@ -121,102 +115,86 @@ function DayBand({ day, jobs, today, colTemplate, onAddDay, onRowMenu }: DayBand
   const isEmpty = sorted.length === 0;
 
   return (
-    <div>
+    <Fragment>
       {/* Day header band */}
-      <div
-        className="flex items-center justify-between px-5 py-2"
-        style={{
-          backgroundColor: isToday ? '#FAFAFA' : C.paper,
-          borderBottom: `1px solid ${C.borderSoft}`,
-        }}
+      <tr
+        className={cn(
+          'border-b',
+          isToday ? 'bg-muted/60' : 'bg-muted/20',
+        )}
       >
-        <div className="flex items-baseline gap-3">
-          <span
-            className="text-[11px] uppercase tracking-[0.2em]"
-            style={{ color: isToday ? C.ink : C.muted, fontFamily: FONTS.sans, fontWeight: isToday ? 600 : 500 }}
-          >
-            {dayLabel(day.date)}
-          </span>
-          <span
-            className="text-[14px] font-medium tabular-nums"
-            style={{ color: C.ink, fontFamily: FONTS.sans }}
-          >
-            {monthName(day.date).slice(0, 3)} {dayNum(day.date)}
-          </span>
-          {isToday && (
-            <span
-              className="text-[9px] px-1.5 py-0.5 rounded font-medium uppercase tracking-[0.1em]"
-              style={{ backgroundColor: C.lime, color: C.ink, fontFamily: FONTS.sans }}
-            >
-              Today
-            </span>
-          )}
-          {hasOTorDT && (
-            <span
-              className="flex items-center gap-1 text-[10px]"
-              style={{ color: C.amber, fontFamily: FONTS.sans }}
-            >
-              <AlertTriangle size={10} strokeWidth={2.4} />
-              {bd.ot > 0 && `${bd.ot.toFixed(1)} OT`}
-              {bd.ot > 0 && bd.dt > 0 && ' · '}
-              {bd.dt > 0 && `${bd.dt.toFixed(1)} DT`}
-            </span>
-          )}
-        </div>
-        <div className="flex items-center gap-3">
-          <span
-            className="text-[12px] tabular-nums font-medium"
-            style={{
-              color: isEmpty ? C.mutedSoft : C.ink,
-              fontFamily: FONTS.mono,
-            }}
-          >
-            {isEmpty ? '— · 0.0h' : `${sorted.length} · ${bd.total.toFixed(1)}h`}
-          </span>
-          {onAddDay && (
-            <button
-              onClick={() => onAddDay(day.date)}
-              className="w-6 h-6 rounded-full flex items-center justify-center transition-colors hover:bg-white/60"
-              style={{
-                backgroundColor: C.bone,
-                border: `1px solid ${C.borderSoft}`,
-                color: C.inkSoft,
-              }}
-              title={`Add an entry for ${dayLabel(day.date)} ${monthName(day.date).slice(0, 3)} ${dayNum(day.date)}`}
-              aria-label="Add entry"
-            >
-              <Plus size={11} strokeWidth={2.5} />
-            </button>
-          )}
-        </div>
-      </div>
+        <td colSpan={7} className="px-5 py-2">
+          <div className="flex items-center justify-between">
+            <div className="flex items-baseline gap-3">
+              <span
+                className={cn(
+                  'text-[11px] uppercase tracking-[0.2em]',
+                  isToday ? 'text-foreground font-semibold' : 'text-muted-foreground font-medium',
+                )}
+              >
+                {dayLabel(day.date)}
+              </span>
+              <span className="text-[14px] font-medium tabular-nums text-foreground">
+                {monthName(day.date).slice(0, 3)} {dayNum(day.date)}
+              </span>
+              {isToday && (
+                <Badge variant="default" className="text-[9px] uppercase tracking-[0.1em] rounded">
+                  Today
+                </Badge>
+              )}
+              {hasOTorDT && (
+                <span className="flex items-center gap-1 text-[10px] text-foreground font-medium">
+                  <AlertTriangle size={10} strokeWidth={2.4} />
+                  {bd.ot > 0 && `${bd.ot.toFixed(1)} OT`}
+                  {bd.ot > 0 && bd.dt > 0 && ' · '}
+                  {bd.dt > 0 && `${bd.dt.toFixed(1)} DT`}
+                </span>
+              )}
+            </div>
+            <div className="flex items-center gap-3">
+              <span
+                className={cn(
+                  'text-[12px] font-mono tabular-nums font-medium',
+                  isEmpty ? 'text-muted-foreground' : 'text-foreground',
+                )}
+              >
+                {isEmpty ? '— · 0.0h' : `${sorted.length} · ${bd.total.toFixed(1)}h`}
+              </span>
+              {onAddDay && (
+                <Button
+                  variant="outline"
+                  size="icon-xs"
+                  onClick={() => onAddDay(day.date)}
+                  title={`Add an entry for ${dayLabel(day.date)} ${monthName(day.date).slice(0, 3)} ${dayNum(day.date)}`}
+                  aria-label="Add entry"
+                  className="rounded-full"
+                >
+                  <Plus size={11} strokeWidth={2.5} />
+                </Button>
+              )}
+            </div>
+          </div>
+        </td>
+      </tr>
 
       {/* Entry rows */}
       {isEmpty ? (
-        <div
-          className="px-5 py-3 text-[12px]"
-          style={{
-            color: C.mutedSoft,
-            fontFamily: FONTS.sans,
-            fontStyle: 'italic',
-            backgroundColor: C.cream,
-            borderBottom: `1px solid ${C.borderSoft}`,
-          }}
-        >
-          No entries logged
-        </div>
+        <TableRow className="hover:bg-transparent">
+          <TableCell colSpan={7} className="px-5 py-3 text-[12px] italic text-muted-foreground">
+            No entries logged
+          </TableCell>
+        </TableRow>
       ) : (
         sorted.map((e) => (
           <EntryRow
             key={e.id}
             entry={e}
             jobs={jobs}
-            colTemplate={colTemplate}
             onRowMenu={onRowMenu}
           />
         ))
       )}
-    </div>
+    </Fragment>
   );
 }
 
@@ -225,11 +203,10 @@ function DayBand({ day, jobs, today, colTemplate, onAddDay, onRowMenu }: DayBand
 interface EntryRowProps {
   entry: TimeEntry;
   jobs: Job[];
-  colTemplate: string;
   onRowMenu?: (entry: TimeEntry) => void;
 }
 
-function EntryRow({ entry, jobs, colTemplate, onRowMenu }: EntryRowProps) {
+function EntryRow({ entry, jobs, onRowMenu }: EntryRowProps) {
   const job = jobs.find((j) => j.id === entry.jobId);
   const showManual = isBackfilledLivePunch(entry, jobs);
   const locked = entry.status === 'paid' || entry.status === 'approved';
@@ -237,122 +214,89 @@ function EntryRow({ entry, jobs, colTemplate, onRowMenu }: EntryRowProps) {
   const hasDT = entry.dtH > 0;
 
   return (
-    <div
-      className="grid items-center px-5 py-2.5 transition-colors group hover:bg-white/40"
-      style={{
-        gridTemplateColumns: colTemplate,
-        borderBottom: `1px solid ${C.borderSoft}`,
-        backgroundColor: C.cream,
-        opacity: locked ? 0.85 : 1,
-      }}
-    >
-      {/* Day cell — subtle, since the band already shows the day */}
-      <span
-        className="text-[11px] tabular-nums"
-        style={{ color: C.mutedSoft, fontFamily: FONTS.sans }}
-      >
+    <TableRow className={cn('group', locked && 'opacity-80')}>
+      {/* Day cell — subtle */}
+      <TableCell className="px-5 text-[11px] font-mono tabular-nums text-muted-foreground">
         {dayLabel(entry.date).slice(0, 3)} {monthName(entry.date).slice(0, 3)} {dayNum(entry.date)}
-      </span>
+      </TableCell>
 
       {/* Job + notes */}
-      <div className="min-w-0 flex items-center gap-2.5">
-        <span
-          className="block w-1 h-7 rounded-full flex-shrink-0"
-          style={{ backgroundColor: job?.color ?? C.muted }}
-        />
-        <div className="min-w-0">
-          <div className="flex items-center gap-2 flex-wrap">
-            <span
-              className="text-[13px] font-medium truncate"
-              style={{ color: C.ink, fontFamily: FONTS.sans }}
-            >
-              {job?.name ?? 'Unknown job'}
-            </span>
-            {showManual && <ManualBadge />}
-            {locked && (
-              <Lock size={10} strokeWidth={2.4} style={{ color: C.mutedSoft }} />
+      <TableCell>
+        <div className="min-w-0 flex items-center gap-2.5">
+          <span className="block w-1 h-7 rounded-full flex-shrink-0 bg-foreground/60" />
+          <div className="min-w-0">
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="text-[13px] font-medium truncate text-foreground">
+                {job?.name ?? 'Unknown job'}
+              </span>
+              {showManual && <ManualBadge />}
+              {locked && (
+                <Lock size={10} strokeWidth={2.4} className="text-muted-foreground" />
+              )}
+            </div>
+            {entry.note && (
+              <div className="text-[11px] italic truncate mt-0.5 text-muted-foreground">
+                &ldquo;{entry.note}&rdquo;
+              </div>
             )}
           </div>
-          {entry.note && (
-            <div
-              className="text-[11px] italic truncate mt-0.5"
-              style={{ color: C.muted, fontFamily: FONTS.sans }}
-            >
-              &ldquo;{entry.note}&rdquo;
-            </div>
-          )}
         </div>
-      </div>
+      </TableCell>
 
       {/* Time range */}
-      <span
-        className="text-[12px] tabular-nums"
-        style={{ color: C.inkSoft, fontFamily: FONTS.mono }}
-      >
+      <TableCell className="text-[12px] font-mono tabular-nums text-foreground/80">
         {entry.start} → {entry.end}
-      </span>
+      </TableCell>
 
       {/* Hours (right aligned, mono, larger) */}
-      <span
-        className="text-[14px] tabular-nums text-right"
-        style={{ color: C.ink, fontFamily: FONTS.mono, fontWeight: 500 }}
-      >
+      <TableCell className="text-right text-[14px] font-mono tabular-nums font-medium text-foreground">
         {entry.hours.toFixed(1)}h
-      </span>
+      </TableCell>
 
       {/* Pay code · OT/DT badges */}
-      <div className="flex items-center gap-1.5 flex-wrap min-w-0">
-        {entry.paycode && (
-          <span
-            className="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded font-medium"
-            style={{ backgroundColor: C.bone, color: C.inkSoft, fontFamily: FONTS.sans }}
-          >
-            {entry.paycode}
-          </span>
-        )}
-        {entry.costCenter && (
-          <span
-            className="text-[11px] truncate"
-            style={{ color: C.muted, fontFamily: FONTS.sans }}
-          >
-            {entry.costCenter}
-          </span>
-        )}
-        {hasOT && (
-          <span
-            className="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded font-medium"
-            style={{ backgroundColor: '#F0F0F0', color: '#404040', fontFamily: FONTS.sans }}
-          >
-            +{entry.otH.toFixed(1)} OT
-          </span>
-        )}
-        {hasDT && (
-          <span
-            className="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded font-medium"
-            style={{ backgroundColor: '#E5E5E5', color: '#0A0A0A', fontFamily: FONTS.sans }}
-          >
-            +{entry.dtH.toFixed(1)} DT
-          </span>
-        )}
-      </div>
+      <TableCell>
+        <div className="flex items-center gap-1.5 flex-wrap min-w-0">
+          {entry.paycode && (
+            <Badge variant="outline" className="text-[10px] uppercase tracking-wider rounded">
+              {entry.paycode}
+            </Badge>
+          )}
+          {entry.costCenter && (
+            <span className="text-[11px] truncate text-muted-foreground">
+              {entry.costCenter}
+            </span>
+          )}
+          {hasOT && (
+            <Badge variant="secondary" className="text-[10px] uppercase tracking-wider rounded">
+              +{entry.otH.toFixed(1)} OT
+            </Badge>
+          )}
+          {hasDT && (
+            <Badge variant="default" className="text-[10px] uppercase tracking-wider rounded">
+              +{entry.dtH.toFixed(1)} DT
+            </Badge>
+          )}
+        </div>
+      </TableCell>
 
       {/* Status */}
-      <div>
+      <TableCell>
         <StatusPill status={entry.status} />
-      </div>
+      </TableCell>
 
       {/* Actions */}
-      <div className="flex justify-end">
-        <button
+      <TableCell className="px-2">
+        <Button
+          variant="ghost"
+          size="icon-sm"
           onClick={() => onRowMenu?.(entry)}
-          className="w-7 h-7 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-white/60"
-          style={{ color: C.muted }}
+          className="opacity-0 group-hover:opacity-100 transition-opacity"
           aria-label="Row actions"
           disabled={locked}
         >
           <MoreHorizontal size={14} />
-        </button>
-      </div>
-    </div>
+        </Button>
+      </TableCell>
+    </TableRow>
   );
 }
