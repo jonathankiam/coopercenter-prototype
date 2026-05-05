@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Clock, CalendarDays, Receipt, User, Smartphone } from 'lucide-react';
+import { Clock, CalendarDays, ListChecks, Receipt, User, Smartphone } from 'lucide-react';
 import {
   Sidebar as UISidebar,
   SidebarContent,
@@ -23,10 +23,11 @@ interface NavItem {
 }
 
 const NAV: NavItem[] = [
-  { href: '/today',     label: 'Today',     icon: Clock },
-  { href: '/timesheet', label: 'Timesheet', icon: CalendarDays },
-  { href: '/expenses',  label: 'Expenses',  icon: Receipt },
-  { href: '/profile',   label: 'Profile',   icon: User },
+  { href: '/today',      label: 'Today',      icon: Clock },
+  { href: '/time-entry', label: 'Time entry', icon: ListChecks },
+  { href: '/timesheet',  label: 'Timesheet',  icon: CalendarDays },
+  { href: '/expenses',   label: 'Expenses',   icon: Receipt },
+  { href: '/profile',    label: 'Profile',    icon: User },
 ];
 
 interface SidebarProps {

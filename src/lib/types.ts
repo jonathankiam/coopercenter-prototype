@@ -16,6 +16,17 @@ export interface Job {
   costCenters: string[];
 }
 
+/**
+ * How the punch was created. Drives the source pill on the Time entry screen.
+ *  - 'auto'   : came from clock in / out
+ *  - 'manual' : worker typed it from scratch
+ *  - 'edited' : was 'auto' but the worker changed time / client / paycode
+ *
+ * Optional and additive — existing data without `source` falls back to
+ * `manuallyEntered ? 'manual' : 'auto'`.
+ */
+export type EntrySource = 'auto' | 'manual' | 'edited';
+
 export interface TimeEntry {
   id: number;
   jobId: number;
@@ -31,6 +42,7 @@ export interface TimeEntry {
   paycode?: string;
   costCenter?: string;
   manuallyEntered?: boolean;
+  source?: EntrySource;
 }
 
 export type ExpenseKind = 'regular' | 'mileage';
