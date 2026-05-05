@@ -13,8 +13,10 @@ import {
   Receipt,
   Car,
 } from 'lucide-react';
-import { C, FONTS } from '@/lib/design';
-import { dayLabel, dayNum, fmtMoney, monthName } from '@/lib/utils';
+import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { dayLabel, dayNum, fmtMoney, monthName, cn } from '@/lib/utils';
 import StatusPill from '@/components/StatusPill';
 import type { ExpenseItem } from '@/lib/types';
 import type { ReportSummary } from '@/lib/expenses';
@@ -29,7 +31,6 @@ interface ReportsListProps {
   onReceiptClick?: (item: ExpenseItem) => void;
 }
 
-// Spreadsheet column template — Date / Type / Vendor or Trip / Category / Amount / Receipt / Status / actions
 const COL = '110px 90px minmax(220px, 1.4fr) 150px 110px 130px 110px 36px';
 
 export default function ReportsList({
@@ -42,45 +43,22 @@ export default function ReportsList({
 }: ReportsListProps) {
   if (summaries.length === 0) {
     return (
-      <div
-        className="rounded-2xl p-12 text-center mb-6"
-        style={{ backgroundColor: C.cream, border: `1px dashed ${C.border}` }}
-      >
-        <Receipt size={22} style={{ color: C.mutedSoft, margin: '0 auto 10px' }} />
-        <div
-          className="text-[16px]"
-          style={{ color: C.muted, fontFamily: FONTS.serif, fontStyle: 'italic' }}
-        >
-          No reports in this view
-        </div>
-        <div
-          className="text-[11px] mt-1"
-          style={{ color: C.mutedSoft, fontFamily: FONTS.sans }}
-        >
+      <Card className="p-12 text-center mb-6 border-dashed">
+        <Receipt className="size-5 text-muted-foreground/60 mx-auto mb-2" />
+        <div className="text-base text-muted-foreground">No reports in this view</div>
+        <div className="text-xs mt-1 text-muted-foreground/70">
           Switch tabs above or add a new expense to populate a draft report.
         </div>
-      </div>
+      </Card>
     );
   }
 
   return (
-    <div
-      className="rounded-2xl overflow-hidden mb-6"
-      style={{ backgroundColor: C.cream, border: `1px solid ${C.border}` }}
-    >
+    <Card className="overflow-hidden mb-6 p-0 gap-0">
       {/* Header row */}
       <div
-        className="grid items-center px-5 py-2.5"
-        style={{
-          gridTemplateColumns: COL,
-          backgroundColor: C.bone,
-          borderBottom: `1px solid ${C.border}`,
-          color: C.muted,
-          fontFamily: FONTS.sans,
-          fontSize: 10,
-          letterSpacing: '0.18em',
-          textTransform: 'uppercase',
-        }}
+        className="grid items-center px-5 py-2.5 bg-muted border-b text-[10px] uppercase tracking-widest text-muted-foreground font-medium"
+        style={{ gridTemplateColumns: COL }}
       >
         <span>Date</span>
         <span>Type</span>
@@ -103,11 +81,9 @@ export default function ReportsList({
           onReceiptClick={onReceiptClick}
         />
       ))}
-    </div>
+    </Card>
   );
 }
-
-// ─── Report band ─── //
 
 interface ReportBandProps {
   summary: ReportSummary;
@@ -128,34 +104,27 @@ function ReportBand({
 }: ReportBandProps) {
   const [expanded, setExpanded] = useState(defaultExpanded);
   const { report, job, items, total, mileage, itemCount } = summary;
-  const accent = job?.color ?? C.muted;
+  const accent = job?.color ?? 'currentColor';
   const canSubmit = isOpenStatus(report.status);
   const submitted = !canSubmit;
 
   const weekEnd = new Date(report.weekStart);
   weekEnd.setDate(weekEnd.getDate() + 6);
 
-  // Sort items by date ascending so the oldest expense in the period appears first
   const sortedItems = [...items].sort((a, b) => a.date.getTime() - b.date.getTime());
 
   return (
     <div>
       {/* Band header */}
-      <div
-        className="flex items-center justify-between px-5 py-3"
-        style={{
-          backgroundColor: C.paper,
-          borderBottom: expanded ? `1px solid ${C.borderSoft}` : `1px solid ${C.border}`,
-        }}
-      >
+      <div className="flex items-center justify-between px-5 py-3 bg-muted/30 border-b">
         <button
           onClick={() => setExpanded((o) => !o)}
           className="flex items-center gap-3 text-left flex-1 min-w-0"
         >
           {expanded ? (
-            <ChevronDown size={14} style={{ color: C.muted, flexShrink: 0 }} />
+            <ChevronDown className="size-3.5 text-muted-foreground flex-shrink-0" />
           ) : (
-            <ChevronRight size={14} style={{ color: C.muted, flexShrink: 0 }} />
+            <ChevronRight className="size-3.5 text-muted-foreground flex-shrink-0" />
           )}
           <span
             className="block w-1.5 h-7 rounded-full flex-shrink-0"
@@ -163,23 +132,13 @@ function ReportBand({
           />
           <div className="min-w-0">
             <div className="flex items-baseline gap-2 flex-wrap">
-              <span
-                className="text-[14px] font-medium truncate"
-                style={{ color: C.ink, fontFamily: FONTS.sans }}
-              >
-                {report.client}
-              </span>
-              <span
-                className="text-[11px] tabular-nums"
-                style={{ color: C.muted, fontFamily: FONTS.sans }}
-              >
-                Week of {monthName(report.weekStart).slice(0, 3)} {dayNum(report.weekStart)} — {monthName(weekEnd).slice(0, 3)} {dayNum(weekEnd)}
+              <span className="text-sm font-medium truncate">{report.client}</span>
+              <span className="text-[11px] tabular-nums text-muted-foreground">
+                Week of {monthName(report.weekStart).slice(0, 3)} {dayNum(report.weekStart)} —{' '}
+                {monthName(weekEnd).slice(0, 3)} {dayNum(weekEnd)}
               </span>
             </div>
-            <div
-              className="text-[10px] mt-0.5 tabular-nums uppercase tracking-wider"
-              style={{ color: C.mutedSoft, fontFamily: FONTS.sans }}
-            >
+            <div className="text-[10px] mt-0.5 tabular-nums uppercase tracking-wider text-muted-foreground/70">
               {itemCount} {itemCount === 1 ? 'item' : 'items'}
               {mileage > 0 && ` · ${mileage.toFixed(0)} mi`}
             </div>
@@ -187,27 +146,14 @@ function ReportBand({
         </button>
 
         <div className="flex items-center gap-3 flex-shrink-0">
-          <span
-            className="text-[16px] tabular-nums font-medium"
-            style={{ color: C.ink, fontFamily: FONTS.mono }}
-          >
-            {fmtMoney(total)}
-          </span>
+          <span className="text-base tabular-nums font-semibold font-mono">{fmtMoney(total)}</span>
           <StatusPill status={report.status} size="md" />
-          <button
+          <Button
             onClick={onSubmit}
             disabled={!canSubmit}
-            className="flex items-center gap-1.5 h-8 px-3 rounded-full transition-all"
-            style={{
-              backgroundColor: canSubmit ? C.lime : C.bone,
-              color: canSubmit ? C.ink : C.muted,
-              border: `1px solid ${canSubmit ? C.limeDeep : C.borderSoft}`,
-              fontFamily: FONTS.sans,
-              fontSize: 11,
-              fontWeight: 600,
-              letterSpacing: '0.05em',
-              cursor: canSubmit ? 'pointer' : 'not-allowed',
-            }}
+            size="sm"
+            variant={canSubmit ? 'default' : 'outline'}
+            className="gap-1.5 uppercase tracking-wide text-[11px]"
             title={
               submitted
                 ? 'This report has already been submitted'
@@ -216,21 +162,21 @@ function ReportBand({
           >
             {submitted ? (
               <>
-                <Check size={11} strokeWidth={2.5} />
-                <span className="uppercase">Submitted</span>
+                <Check className="size-3" />
+                Submitted
               </>
             ) : report.status === 'rejected' ? (
               <>
-                <span className="uppercase">Resubmit</span>
-                <ArrowUpRight size={11} strokeWidth={2.5} />
+                Resubmit
+                <ArrowUpRight className="size-3" />
               </>
             ) : (
               <>
-                <span className="uppercase">Submit</span>
-                <ArrowUpRight size={11} strokeWidth={2.5} />
+                Submit
+                <ArrowUpRight className="size-3" />
               </>
             )}
-          </button>
+          </Button>
         </div>
       </div>
 
@@ -246,47 +192,30 @@ function ReportBand({
               onReceiptClick={onReceiptClick}
             />
           ))}
-          {/* Add-item row appears only on draft/rejected reports */}
           {onAddItem && isOpenStatus(report.status) && (
             <button
               onClick={onAddItem}
-              className="w-full grid items-center px-5 py-2.5 transition-colors hover:bg-white/40 text-left"
-              style={{
-                gridTemplateColumns: COL,
-                borderBottom: `1px solid ${C.borderSoft}`,
-                backgroundColor: C.cream,
-                color: C.muted,
-                fontFamily: FONTS.sans,
-              }}
+              className="w-full grid items-center px-5 py-2.5 transition-colors hover:bg-accent/50 text-left text-muted-foreground border-b bg-card"
+              style={{ gridTemplateColumns: COL }}
             >
-              <span className="col-span-8 flex items-center gap-2 text-[12px]">
-                <Plus size={12} strokeWidth={2.4} />
+              <span className="col-span-8 flex items-center gap-2 text-xs">
+                <Plus className="size-3" />
                 Add a line item to this report
               </span>
             </button>
           )}
           {/* Subtotal row */}
           <div
-            className="grid items-center px-5 py-2.5"
-            style={{
-              gridTemplateColumns: COL,
-              backgroundColor: C.bone,
-              borderBottom: `1px solid ${C.border}`,
-            }}
+            className="grid items-center px-5 py-2.5 bg-muted/40 border-b"
+            style={{ gridTemplateColumns: COL }}
           >
             <span></span>
             <span></span>
-            <span
-              className="text-[10px] uppercase tracking-[0.2em]"
-              style={{ color: C.muted, fontFamily: FONTS.sans }}
-            >
+            <span className="text-[10px] uppercase tracking-widest text-muted-foreground font-medium">
               Subtotal · {itemCount} {itemCount === 1 ? 'item' : 'items'}
             </span>
             <span></span>
-            <span
-              className="text-right tabular-nums text-[14px] font-medium"
-              style={{ color: C.ink, fontFamily: FONTS.mono }}
-            >
+            <span className="text-right tabular-nums text-sm font-medium font-mono">
               {fmtMoney(total)}
             </span>
             <span></span>
@@ -299,8 +228,6 @@ function ReportBand({
   );
 }
 
-// ─── Line item row ─── //
-
 interface LineItemRowProps {
   item: ExpenseItem;
   locked: boolean;
@@ -311,7 +238,6 @@ interface LineItemRowProps {
 function LineItemRow({ item, locked, onMenu, onReceiptClick }: LineItemRowProps) {
   const isMileage = item.kind === 'mileage';
 
-  // For regular expenses we show vendor + note; for mileage we show "From → To · X mi"
   const description = isMileage
     ? `${item.tripFrom ?? '—'} → ${item.tripTo ?? '—'}`
     : item.vendor ?? '—';
@@ -321,82 +247,62 @@ function LineItemRow({ item, locked, onMenu, onReceiptClick }: LineItemRowProps)
 
   return (
     <div
-      className="grid items-center px-5 py-2.5 transition-colors group hover:bg-white/40"
-      style={{
-        gridTemplateColumns: COL,
-        borderBottom: `1px solid ${C.borderSoft}`,
-        backgroundColor: C.cream,
-        opacity: locked ? 0.85 : 1,
-      }}
+      className={cn(
+        'grid items-center px-5 py-2.5 transition-colors group hover:bg-accent/50 border-b bg-card',
+        locked && 'opacity-85',
+      )}
+      style={{ gridTemplateColumns: COL }}
     >
       {/* Date */}
-      <span
-        className="text-[12px] tabular-nums"
-        style={{ color: C.inkSoft, fontFamily: FONTS.sans }}
-      >
+      <span className="text-xs tabular-nums text-foreground/80">
         {dayLabel(item.date).slice(0, 3)} {monthName(item.date).slice(0, 3)} {dayNum(item.date)}
       </span>
 
       {/* Type */}
-      <div
-        className="flex items-center gap-1.5 text-[11px] uppercase tracking-wider px-2 py-0.5 rounded w-fit"
-        style={{
-          backgroundColor: isMileage ? '#E5EFE5' : C.bone,
-          color: isMileage ? '#3F5320' : C.inkSoft,
-          fontFamily: FONTS.sans,
-        }}
+      <Badge
+        variant="outline"
+        className={cn(
+          'uppercase tracking-wide text-[10px] gap-1 w-fit',
+          isMileage
+            ? 'bg-emerald-50 text-emerald-800 border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-900/60'
+            : 'bg-muted text-muted-foreground border-transparent',
+        )}
       >
-        {isMileage ? <Car size={10} strokeWidth={2.4} /> : <Receipt size={10} strokeWidth={2.4} />}
+        {isMileage ? <Car className="size-2.5" /> : <Receipt className="size-2.5" />}
         {isMileage ? 'Mileage' : 'Expense'}
-      </div>
+      </Badge>
 
       {/* Vendor / Trip + note */}
       <div className="min-w-0">
-        <div
-          className="text-[13px] font-medium truncate"
-          style={{ color: C.ink, fontFamily: FONTS.sans }}
-        >
-          {description}
-        </div>
+        <div className="text-sm font-medium truncate">{description}</div>
         {subDescription && (
-          <div
-            className="text-[11px] italic truncate mt-0.5"
-            style={{ color: C.muted, fontFamily: FONTS.sans }}
-          >
+          <div className="text-[11px] italic truncate mt-0.5 text-muted-foreground">
             {isMileage ? subDescription : `“${subDescription}”`}
           </div>
         )}
       </div>
 
       {/* Category */}
-      <span
-        className="text-[12px] truncate"
-        style={{ color: C.inkSoft, fontFamily: FONTS.sans }}
-      >
+      <span className="text-xs truncate text-foreground/80">
         {isMileage ? 'Mileage · IRS rate' : item.category ?? '—'}
       </span>
 
       {/* Amount */}
-      <span
-        className="text-right tabular-nums text-[14px] font-medium"
-        style={{ color: C.ink, fontFamily: FONTS.mono }}
-      >
+      <span className="text-right tabular-nums text-sm font-medium font-mono">
         {fmtMoney(item.amount)}
       </span>
 
       {/* Receipt */}
       <button
         onClick={() => onReceiptClick?.(item)}
-        className="flex items-center gap-1.5 text-left transition-colors hover:underline"
-        style={{
-          color: item.receipt ? C.inkSoft : C.mutedSoft,
-          fontFamily: FONTS.sans,
-          fontSize: 11,
-        }}
+        className={cn(
+          'flex items-center gap-1.5 text-left transition-colors hover:underline text-[11px]',
+          item.receipt ? 'text-foreground/80' : 'text-muted-foreground/60',
+        )}
         disabled={!item.receipt}
         title={item.receipt ? `View ${item.receipt.label}` : 'No receipt attached'}
       >
-        <Paperclip size={11} strokeWidth={2.2} />
+        <Paperclip className="size-3" />
         <span className="truncate">{item.receipt?.label ?? 'Missing'}</span>
       </button>
 
@@ -405,15 +311,16 @@ function LineItemRow({ item, locked, onMenu, onReceiptClick }: LineItemRowProps)
 
       {/* Actions */}
       <div className="flex justify-end">
-        <button
+        <Button
           onClick={() => onMenu?.(item)}
-          className="w-7 h-7 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-white/60"
-          style={{ color: C.muted }}
+          variant="ghost"
+          size="icon"
+          className="size-7 opacity-0 group-hover:opacity-100"
           aria-label="Row actions"
           disabled={locked}
         >
-          {locked ? <Lock size={12} /> : <MoreHorizontal size={14} />}
-        </button>
+          {locked ? <Lock className="size-3" /> : <MoreHorizontal className="size-3.5" />}
+        </Button>
       </div>
     </div>
   );

@@ -1,4 +1,11 @@
+import { clsx, type ClassValue } from 'clsx';
+import { twMerge } from 'tailwind-merge';
 import type { TimeEntry, Job } from './types';
+
+// shadcn's class-merging helper. Use everywhere that conditionally composes Tailwind classes.
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs));
+}
 
 export const DAY_MS = 86400000;
 
@@ -37,15 +44,12 @@ export const computeBreakdown = (entries: TimeEntry[]): Breakdown =>
     { total: 0, regular: 0, ot: 0, dt: 0 },
   );
 
-// True when an entry was manually backfilled at a live-clock-in/out assignment.
-// Manual-only assignments don't get a Manual badge — every entry there is manual by definition.
 export const isBackfilledLivePunch = (entry: TimeEntry | undefined, jobs: Job[]): boolean => {
   if (!entry?.manuallyEntered) return false;
   const job = jobs.find((j) => j.id === entry.jobId);
   return job?.kind === 'live';
 };
 
-// Sunday-anchored week start at noon (avoids DST edge cases).
 export const startOfWeek = (d: Date): Date => {
   const x = new Date(d);
   x.setHours(12, 0, 0, 0);

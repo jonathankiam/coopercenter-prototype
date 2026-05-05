@@ -1,5 +1,4 @@
 import { getJobs, getEntriesForDate, getEntriesForWeek, getCurrentUser } from '@/lib/data';
-import { C, FONTS } from '@/lib/design';
 import StatsBar from '@/components/today/StatsBar';
 import ActiveAssignmentCard from '@/components/today/ActiveAssignmentCard';
 import EntriesList from '@/components/today/EntriesList';
@@ -29,18 +28,11 @@ export default async function TodayPage() {
   return (
     <div className="min-h-screen px-10 py-8 max-w-[1400px] mx-auto">
       <header className="mb-7">
-        <div
-          className="text-[11px] uppercase tracking-[0.25em]"
-          style={{ color: C.muted, fontFamily: FONTS.sans }}
-        >
+        <div className="text-[11px] uppercase tracking-widest text-muted-foreground font-medium">
           {dateLabel}
         </div>
-        <h1
-          className="text-[36px] mt-1 tracking-tight"
-          style={{ color: C.ink, fontFamily: FONTS.serif }}
-        >
-          <span style={{ fontStyle: 'italic' }}>{greeting},</span>{' '}
-          <span>{user.name}</span>
+        <h1 className="text-3xl font-semibold tracking-tight mt-1">
+          {greeting}, {user.name}
         </h1>
       </header>
 
@@ -48,7 +40,7 @@ export default async function TodayPage() {
         <StatsBar todayEntries={todayEntries} weekEntries={weekEntries} jobs={jobs} />
       </div>
 
-      <div className="grid grid-cols-3 gap-5" style={{ minHeight: 580 }}>
+      <div className="grid grid-cols-3 gap-5 min-h-[580px]">
         <div className="col-span-2">
           <ActiveAssignmentCard jobs={jobs} initialJobId={jobs[0]?.id} />
         </div>

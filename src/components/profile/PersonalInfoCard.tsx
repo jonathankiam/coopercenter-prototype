@@ -1,5 +1,5 @@
 import { User, Pencil } from 'lucide-react';
-import { C, FONTS } from '@/lib/design';
+import { Button } from '@/components/ui/button';
 import SettingsCard, { FieldRow } from './SettingsCard';
 import type { CurrentUser } from '@/lib/mock-data';
 
@@ -10,15 +10,16 @@ interface PersonalInfoCardProps {
 
 export default function PersonalInfoCard({ user, onEditField }: PersonalInfoCardProps) {
   const editButton = (field: string) => (
-    <button
+    <Button
       onClick={() => onEditField?.(field)}
-      className="w-7 h-7 rounded-full flex items-center justify-center transition-colors hover:bg-white/60"
-      style={{ color: C.muted }}
+      variant="ghost"
+      size="icon"
+      className="size-7 text-muted-foreground"
       title={`Edit ${field}`}
       aria-label={`Edit ${field}`}
     >
-      <Pencil size={11} strokeWidth={2.4} />
-    </button>
+      <Pencil className="size-3" />
+    </Button>
   );
 
   return (
@@ -27,11 +28,7 @@ export default function PersonalInfoCard({ user, onEditField }: PersonalInfoCard
       title="Personal information"
       description="Contact details and emergency contact on file."
     >
-      <FieldRow
-        label="Full name"
-        value={user.fullName}
-        trailing={editButton('name')}
-      />
+      <FieldRow label="Full name" value={user.fullName} trailing={editButton('name')} />
       <FieldRow
         label="Email"
         value={user.email}
@@ -47,7 +44,7 @@ export default function PersonalInfoCard({ user, onEditField }: PersonalInfoCard
       <FieldRow
         label="Mailing address"
         value={
-          <span style={{ fontFamily: FONTS.sans }}>
+          <span>
             {user.address.line1}
             <br />
             {user.address.city}, {user.address.state} {user.address.zip}

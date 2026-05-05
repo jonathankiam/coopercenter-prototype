@@ -1,6 +1,7 @@
 import { Construction } from 'lucide-react';
 import Link from 'next/link';
-import { C, FONTS } from '@/lib/design';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
 
 interface PlaceholderProps {
   title: string;
@@ -10,42 +11,22 @@ interface PlaceholderProps {
 export default function Placeholder({ title, description }: PlaceholderProps) {
   return (
     <div className="min-h-screen flex items-center justify-center px-10 py-8">
-      <div
-        className="rounded-3xl p-12 max-w-lg text-center"
-        style={{ backgroundColor: C.cream, border: `1px solid ${C.border}` }}
-      >
-        <div
-          className="inline-flex items-center justify-center w-14 h-14 rounded-full mb-5"
-          style={{ backgroundColor: C.bone }}
-        >
-          <Construction size={22} style={{ color: C.inkSoft }} />
-        </div>
-        <h1
-          className="text-[28px] tracking-tight mb-2"
-          style={{ color: C.ink, fontFamily: FONTS.serif, fontStyle: 'italic' }}
-        >
-          {title}
-        </h1>
-        <p
-          className="text-[14px] leading-relaxed mb-6"
-          style={{ color: C.muted, fontFamily: FONTS.sans }}
-        >
-          {description}
-        </p>
-        <Link
-          href="/prototype"
-          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-full transition-colors"
-          style={{
-            backgroundColor: C.ink,
-            color: C.cream,
-            fontFamily: FONTS.sans,
-            fontSize: 13,
-            fontWeight: 500,
-          }}
-        >
-          See it in the mobile prototype
-        </Link>
-      </div>
+      <Card className="max-w-lg text-center">
+        <CardContent className="p-12">
+          <div className="inline-flex items-center justify-center w-14 h-14 rounded-full mb-5 bg-muted">
+            <Construction className="size-5 text-muted-foreground" />
+          </div>
+          <h1 className="text-2xl font-semibold tracking-tight mb-2">
+            {title}
+          </h1>
+          <p className="text-sm leading-relaxed text-muted-foreground mb-6">
+            {description}
+          </p>
+          <Button asChild>
+            <Link href="/prototype">See it in the mobile prototype</Link>
+          </Button>
+        </CardContent>
+      </Card>
     </div>
   );
 }

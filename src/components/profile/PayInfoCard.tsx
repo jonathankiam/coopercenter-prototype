@@ -1,5 +1,6 @@
 import { CreditCard, FileText, Building2 } from 'lucide-react';
-import { C, FONTS } from '@/lib/design';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { fmtMoney } from '@/lib/utils';
 import SettingsCard, { FieldRow } from './SettingsCard';
 import type { CurrentUser } from '@/lib/mock-data';
@@ -19,21 +20,10 @@ export default function PayInfoCard({
   onChangeBank,
 }: PayInfoCardProps) {
   const action = (
-    <button
-      onClick={onViewStubs}
-      className="flex items-center gap-1.5 h-8 px-3 rounded-full transition-colors hover:opacity-90"
-      style={{
-        backgroundColor: C.bone,
-        color: C.inkSoft,
-        border: `1px solid ${C.borderSoft}`,
-        fontFamily: FONTS.sans,
-        fontSize: 12,
-        fontWeight: 500,
-      }}
-    >
-      <FileText size={12} strokeWidth={2.2} />
+    <Button onClick={onViewStubs} variant="outline" size="sm" className="gap-1.5">
+      <FileText className="size-3" />
       Pay stubs & W-2
-    </button>
+    </Button>
   );
 
   return (
@@ -51,10 +41,7 @@ export default function PayInfoCard({
       <FieldRow
         label="Estimated next net"
         value={
-          <span
-            className="tabular-nums"
-            style={{ fontFamily: FONTS.mono, fontWeight: 500 }}
-          >
+          <span className="tabular-nums font-mono font-medium">
             {fmtMoney(user.payInfo.estimatedNet)}
           </span>
         }
@@ -64,36 +51,34 @@ export default function PayInfoCard({
         label="Payment method"
         value={user.payInfo.paymentMethod}
         badge={
-          <span
-            className="text-[9px] px-1.5 py-0.5 rounded font-medium uppercase tracking-wider"
-            style={{ backgroundColor: '#DDE8C4', color: '#3F5320', fontFamily: FONTS.sans }}
+          <Badge
+            variant="outline"
+            className="uppercase tracking-wide text-[9px] bg-emerald-50 text-emerald-800 border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-900/60"
           >
             Verified
-          </span>
+          </Badge>
         }
       />
       <FieldRow
         label="Deposit account"
         value={
           <span className="flex items-center gap-2">
-            <Building2 size={13} strokeWidth={2} style={{ color: C.muted }} />
-            <span style={{ fontFamily: FONTS.sans }}>{user.payInfo.bankName}</span>
-            <span
-              className="tabular-nums text-[12px]"
-              style={{ color: C.muted, fontFamily: FONTS.mono }}
-            >
+            <Building2 className="size-3.5 text-muted-foreground" />
+            <span>{user.payInfo.bankName}</span>
+            <span className="tabular-nums text-xs text-muted-foreground font-mono">
               ····{user.payInfo.accountLast4}
             </span>
           </span>
         }
         trailing={
-          <button
+          <Button
             onClick={onChangeBank}
-            className="text-[12px] underline-offset-2 hover:underline"
-            style={{ color: C.inkSoft, fontFamily: FONTS.sans }}
+            variant="link"
+            size="sm"
+            className="h-auto p-0 text-xs"
           >
             Change
-          </button>
+          </Button>
         }
       />
     </SettingsCard>

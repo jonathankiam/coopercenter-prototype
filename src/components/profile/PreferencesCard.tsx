@@ -2,7 +2,8 @@
 
 import { Settings } from 'lucide-react';
 import SettingsCard from './SettingsCard';
-import { C, FONTS } from '@/lib/design';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { cn } from '@/lib/utils';
 
 export type PrefKey = 'timeFormat' | 'weekStartDay' | 'measurementUnits' | 'defaultExpenseCategory';
 
@@ -34,24 +35,19 @@ function Segmented<T extends string>({
   onChange: (v: T) => void;
 }) {
   return (
-    <div
-      className="inline-flex items-center rounded-full p-0.5"
-      style={{ backgroundColor: C.bone, border: `1px solid ${C.borderSoft}` }}
-    >
+    <div className="inline-flex items-center rounded-md p-0.5 bg-muted border">
       {options.map((opt) => {
         const active = opt.value === value;
         return (
           <button
             key={opt.value}
             onClick={() => onChange(opt.value)}
-            className="h-7 px-3 rounded-full transition-colors"
-            style={{
-              backgroundColor: active ? C.ink : 'transparent',
-              color: active ? C.cream : C.inkSoft,
-              fontFamily: FONTS.sans,
-              fontSize: 12,
-              fontWeight: active ? 600 : 500,
-            }}
+            className={cn(
+              'h-7 px-3 rounded-sm transition-colors text-xs',
+              active
+                ? 'bg-card text-foreground font-semibold shadow-sm'
+                : 'text-muted-foreground hover:text-foreground font-medium',
+            )}
           >
             {opt.label}
           </button>
@@ -118,26 +114,21 @@ export default function PreferencesCard({
         label="Default expense category"
         hint="Pre-selected when adding a new expense."
         control={
-          <select
+          <Select
             value={prefs.defaultExpenseCategory}
-            onChange={(e) => onChange('defaultExpenseCategory', e.target.value)}
-            className="h-8 px-3 rounded-full transition-colors"
-            style={{
-              backgroundColor: C.bone,
-              border: `1px solid ${C.borderSoft}`,
-              color: C.ink,
-              fontFamily: FONTS.sans,
-              fontSize: 12,
-              fontWeight: 500,
-              minWidth: 160,
-            }}
+            onValueChange={(v) => onChange('defaultExpenseCategory', v)}
           >
-            {expenseCategories.map((cat) => (
-              <option key={cat} value={cat}>
-                {cat}
-              </option>
-            ))}
-          </select>
+            <SelectTrigger className="h-8 min-w-[160px]">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {expenseCategories.map((cat) => (
+                <SelectItem key={cat} value={cat}>
+                  {cat}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         }
       />
     </SettingsCard>
@@ -154,23 +145,10 @@ function PrefRow({
   control: React.ReactNode;
 }) {
   return (
-    <div
-      className="grid grid-cols-[1fr_auto] items-center gap-4 px-5 py-3.5"
-      style={{ borderBottom: `1px solid ${C.borderSoft}` }}
-    >
+    <div className="grid grid-cols-[1fr_auto] items-center gap-4 px-5 py-3.5 border-b last:border-b-0">
       <div>
-        <div
-          className="text-[13px] font-medium"
-          style={{ color: C.ink, fontFamily: FONTS.sans }}
-        >
-          {label}
-        </div>
-        <div
-          className="text-[11px] mt-0.5"
-          style={{ color: C.muted, fontFamily: FONTS.sans }}
-        >
-          {hint}
-        </div>
+        <div className="text-sm font-medium">{label}</div>
+        <div className="text-[11px] mt-0.5 text-muted-foreground">{hint}</div>
       </div>
       {control}
     </div>
