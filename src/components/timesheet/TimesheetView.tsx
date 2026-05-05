@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { C, FONTS } from '@/lib/design';
+import { toast } from 'sonner';
 import { monthName, dayNum, computeBreakdown } from '@/lib/utils';
 import {
   buildWeekDays,
@@ -14,7 +14,6 @@ import SummaryBar from './SummaryBar';
 import ClientTabs, { type ClientFilter } from './ClientTabs';
 import TimesheetGrid from './TimesheetGrid';
 import SubmitFooter from './SubmitFooter';
-import Toast from '@/components/Toast';
 import type { TimeEntry, Job } from '@/lib/types';
 import type { EntryStatus } from '@/lib/design';
 
@@ -29,7 +28,6 @@ export default function TimesheetView({ initialEntries, jobs, serverNow }: Times
   const [weekOffset, setWeekOffset] = useState(0);
   const [entries, setEntries] = useState(initialEntries);
   const [filter, setFilter] = useState<ClientFilter>('all');
-  const [toast, setToast] = useState<string | null>(null);
 
   const weekStart = useMemo(() => weekStartFor(today, weekOffset), [today, weekOffset]);
   const weekDays = useMemo(() => buildWeekDays(weekStart, entries), [weekStart, entries]);
@@ -39,7 +37,6 @@ export default function TimesheetView({ initialEntries, jobs, serverNow }: Times
   const timing = weekTimingState(weekStart, today);
   const isFutureWeek = timing === 'future';
 
-  // Apply client filter to the days/entries we hand to the grid + summary.
   const filteredWeekDays = useMemo(() => {
     if (filter === 'all') return weekDays;
     return weekDays.map((d) => ({
@@ -69,16 +66,20 @@ export default function TimesheetView({ initialEntries, jobs, serverNow }: Times
     setEntries((prev) =>
       prev.map((e) => (targetIds.has(e.id) ? { ...e, status: 'pending' as EntryStatus } : e)),
     );
-    setToast(`${client} timecard submitted · ${targetIds.size} ${targetIds.size === 1 ? 'entry' : 'entries'}`);
+    toast.success(`${client} timecard submitted`, {
+      description: `${targetIds.size} ${targetIds.size === 1 ? 'entry' : 'entries'}`,
+    });
   };
 
   const handleAddDay = (date: Date) => {
-    setToast(`Add entry for ${monthName(date).slice(0, 3)} ${dayNum(date)} — coming soon`);
+    toast(`Add entry for ${monthName(date).slice(0, 3)} ${dayNum(date)}`, {
+      description: 'Coming soon',
+    });
   };
 
   const handleRowMenu = (entry: TimeEntry) => {
     const job = jobs.find((j) => j.id === entry.jobId);
-    setToast(`Row actions for ${job?.name ?? 'entry'} — coming soon`);
+    toast(`Row actions for ${job?.name ?? 'entry'}`, { description: 'Coming soon' });
   };
 
   const weekStartLabel = `${monthName(weekDays[0].date)} ${dayNum(weekDays[0].date)}`;
@@ -87,17 +88,11 @@ export default function TimesheetView({ initialEntries, jobs, serverNow }: Times
   return (
     <div className="min-h-screen px-10 py-8 max-w-[1500px] mx-auto pb-24">
       <header className="mb-5">
-        <div
-          className="text-[11px] uppercase tracking-[0.25em]"
-          style={{ color: C.muted, fontFamily: FONTS.sans }}
-        >
+        <div className="text-[11px] uppercase tracking-widest text-muted-foreground font-medium">
           Timesheet
         </div>
-        <h1
-          className="text-[32px] mt-1 tracking-tight leading-tight"
-          style={{ color: C.ink, fontFamily: FONTS.serif }}
-        >
-          <span style={{ fontStyle: 'italic' }}>Weekly timecard</span>
+        <h1 className="text-3xl font-semibold tracking-tight mt-1 leading-tight">
+          Weekly timecard
         </h1>
       </header>
 
@@ -129,14 +124,11 @@ export default function TimesheetView({ initialEntries, jobs, serverNow }: Times
         onRowMenu={handleRowMenu}
       />
 
-      {/* Submit footer pinned to bottom of the page content */}
       <SubmitFooter
         groups={groups}
         isFutureWeek={isFutureWeek}
         onSubmitClient={submitClient}
       />
-
-      {toast && <Toast message={toast} onDismiss={() => setToast(null)} />}
     </div>
   );
 }

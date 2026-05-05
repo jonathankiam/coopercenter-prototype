@@ -2,7 +2,9 @@
 
 import { Shield, KeyRound, Smartphone, LogOut, ChevronRight } from 'lucide-react';
 import SettingsCard from './SettingsCard';
-import { C, FONTS } from '@/lib/design';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 
 interface SecurityCardProps {
   twoFactorEnabled?: boolean;
@@ -43,50 +45,34 @@ export default function SecurityCard({
         action={twoFactorEnabled ? 'Manage' : 'Enable'}
         onClick={onToggle2FA}
         badge={
-          <span
-            className="text-[9px] px-1.5 py-0.5 rounded font-medium uppercase tracking-wider"
-            style={{
-              backgroundColor: twoFactorEnabled ? '#DDE8C4' : '#F5E5C5',
-              color: twoFactorEnabled ? '#3F5320' : '#8A6420',
-              fontFamily: FONTS.sans,
-            }}
+          <Badge
+            variant="outline"
+            className={cn(
+              'uppercase tracking-wide text-[9px]',
+              twoFactorEnabled
+                ? 'bg-emerald-50 text-emerald-800 border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300 dark:border-emerald-900/60'
+                : 'bg-amber-50 text-amber-800 border-amber-200 dark:bg-amber-950/40 dark:text-amber-300 dark:border-amber-900/60',
+            )}
           >
             {twoFactorEnabled ? 'On' : 'Off'}
-          </span>
+          </Badge>
         }
       />
-      <div
-        className="px-5 py-3.5"
-        style={{ borderBottom: `1px solid ${C.borderSoft}` }}
-      >
-        <div
-          className="text-[11px] uppercase tracking-[0.18em]"
-          style={{ color: C.muted, fontFamily: FONTS.sans }}
-        >
+      <div className="px-5 py-3.5 border-b">
+        <div className="text-[11px] uppercase tracking-widest text-muted-foreground font-medium">
           Last sign-in
         </div>
-        <div
-          className="text-[13px] mt-1 tabular-nums"
-          style={{ color: C.ink, fontFamily: FONTS.sans }}
-        >
-          {lastSignInLabel}
-        </div>
+        <div className="text-sm mt-1 tabular-nums">{lastSignInLabel}</div>
       </div>
 
-      <button
+      <Button
         onClick={onSignOut}
-        className="w-full flex items-center justify-center gap-2 py-4 transition-colors hover:bg-white/40"
-        style={{
-          color: C.clay,
-          fontFamily: FONTS.sans,
-          fontSize: 13,
-          fontWeight: 600,
-          letterSpacing: '0.04em',
-        }}
+        variant="ghost"
+        className="w-full justify-center gap-2 py-4 h-auto rounded-none uppercase tracking-wide text-destructive hover:text-destructive hover:bg-destructive/10 font-semibold"
       >
-        <LogOut size={14} strokeWidth={2.4} />
-        <span className="uppercase">Sign out</span>
-      </button>
+        <LogOut className="size-3.5" />
+        Sign out
+      </Button>
     </SettingsCard>
   );
 }
@@ -109,33 +95,19 @@ function ActionRow({
   return (
     <button
       onClick={onClick}
-      className="w-full grid grid-cols-[24px_1fr_auto] items-center gap-4 px-5 py-3.5 transition-colors hover:bg-white/40 text-left"
-      style={{ borderBottom: `1px solid ${C.borderSoft}` }}
+      className="w-full grid grid-cols-[24px_1fr_auto] items-center gap-4 px-5 py-3.5 transition-colors hover:bg-accent/50 text-left border-b"
     >
-      <Icon size={15} strokeWidth={2.2} style={{ color: C.inkSoft }} />
+      <Icon className="size-4 text-foreground" />
       <div className="min-w-0">
         <div className="flex items-center gap-2">
-          <span
-            className="text-[13px] font-medium"
-            style={{ color: C.ink, fontFamily: FONTS.sans }}
-          >
-            {label}
-          </span>
+          <span className="text-sm font-medium">{label}</span>
           {badge}
         </div>
-        <div
-          className="text-[11px] mt-0.5"
-          style={{ color: C.muted, fontFamily: FONTS.sans }}
-        >
-          {hint}
-        </div>
+        <div className="text-[11px] mt-0.5 text-muted-foreground">{hint}</div>
       </div>
-      <span
-        className="flex items-center gap-1.5 text-[12px]"
-        style={{ color: C.inkSoft, fontFamily: FONTS.sans, fontWeight: 500 }}
-      >
+      <span className="flex items-center gap-1.5 text-xs text-foreground font-medium">
         {action}
-        <ChevronRight size={13} strokeWidth={2.2} />
+        <ChevronRight className="size-3" />
       </span>
     </button>
   );

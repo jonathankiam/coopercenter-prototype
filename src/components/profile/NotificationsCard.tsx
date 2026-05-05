@@ -2,8 +2,7 @@
 
 import { Bell } from 'lucide-react';
 import SettingsCard from './SettingsCard';
-import Toggle from '@/components/Toggle';
-import { C, FONTS } from '@/lib/design';
+import { Switch } from '@/components/ui/switch';
 
 export type NotificationKey =
   | 'timecardReminders'
@@ -45,27 +44,16 @@ export default function NotificationsCard({ prefs, onChange }: NotificationsCard
       {ROWS.map((r) => (
         <div
           key={r.key}
-          className="grid grid-cols-[1fr_auto] items-center gap-4 px-5 py-3.5"
-          style={{ borderBottom: `1px solid ${C.borderSoft}` }}
+          className="grid grid-cols-[1fr_auto] items-center gap-4 px-5 py-3.5 border-b last:border-b-0"
         >
           <div>
-            <div
-              className="text-[13px] font-medium"
-              style={{ color: C.ink, fontFamily: FONTS.sans }}
-            >
-              {r.label}
-            </div>
-            <div
-              className="text-[11px] mt-0.5"
-              style={{ color: C.muted, fontFamily: FONTS.sans }}
-            >
-              {r.description}
-            </div>
+            <div className="text-sm font-medium">{r.label}</div>
+            <div className="text-[11px] mt-0.5 text-muted-foreground">{r.description}</div>
           </div>
-          <Toggle
+          <Switch
             checked={prefs[r.key]}
-            onChange={(v) => onChange(r.key, v)}
-            label={r.label}
+            onCheckedChange={(v) => onChange(r.key, v)}
+            aria-label={r.label}
           />
         </div>
       ))}

@@ -1,6 +1,14 @@
-import { C } from './design';
 import type { Job, TimeEntry, ExpenseItem, ExpenseReport } from './types';
 import { DAY_MS } from './utils';
+
+// Job-accent colors. Used as small dots/bars to visually distinguish clients in lists.
+// Tailwind-aligned hex values so they coexist with shadcn's neutral theme.
+const JOB_COLORS = {
+  red:    '#dc2626', // tailwind red-600
+  emerald:'#059669', // tailwind emerald-600
+  amber:  '#f59e0b', // tailwind amber-500
+  sky:    '#0284c7', // tailwind sky-600
+} as const;
 
 // Fixed reference date keeps mock data stable across server/client renders
 // (avoids hydration mismatches that occur when "today" changes mid-render).
@@ -29,16 +37,16 @@ export const EXPENSE_CATEGORIES = [
 ] as const;
 
 export const JOBS: Job[] = [
-  { id: 1, name: 'Goose Manufacturing', client: 'Goose Manufacturing', code: 'GSE-2104', color: C.clay, type: 'Hourly + OT', kind: 'live', location: '847 Industrial Pkwy', rate: 26.5,
+  { id: 1, name: 'Goose Manufacturing', client: 'Goose Manufacturing', code: 'GSE-2104', color: JOB_COLORS.red, type: 'Hourly + OT', kind: 'live', location: '847 Industrial Pkwy', rate: 26.5,
     paycodes: ['Regular', 'Overtime', 'Double Time', 'Holiday'],
     costCenters: ['Production - Line A', 'Production - Line B', 'Maintenance', 'QA / Inspection'] },
-  { id: 2, name: 'Plant Academy · Greenhouse Lead', client: 'Plant Academy', code: 'PA-GHL', color: C.moss, type: 'Manual Punch', kind: 'manual', location: 'Greenhouse Pavilion', rate: 38.0,
+  { id: 2, name: 'Plant Academy · Greenhouse Lead', client: 'Plant Academy', code: 'PA-GHL', color: JOB_COLORS.emerald, type: 'Manual Punch', kind: 'manual', location: 'Greenhouse Pavilion', rate: 38.0,
     paycodes: ['Regular', 'Overtime', 'Holiday'],
     costCenters: ['Adult Programs', 'Youth Programs', 'Corporate Workshops'] },
-  { id: 3, name: 'Plant Academy · Field Workshop', client: 'Plant Academy', code: 'PA-FW', color: C.amber, type: 'Manual Punch', kind: 'manual', location: 'Outdoor Field Sites', rate: 26.0,
+  { id: 3, name: 'Plant Academy · Field Workshop', client: 'Plant Academy', code: 'PA-FW', color: JOB_COLORS.amber, type: 'Manual Punch', kind: 'manual', location: 'Outdoor Field Sites', rate: 26.0,
     paycodes: ['Regular', 'Overtime', 'Travel'],
     costCenters: ['Adult Programs', 'Youth Programs', 'Off-site'] },
-  { id: 4, name: 'Plant Academy · Lab Prep', client: 'Plant Academy', code: 'PA-LP', color: C.ocean, type: 'Manual Punch', kind: 'manual', location: 'Curriculum Lab, Bldg C', rate: 22.0,
+  { id: 4, name: 'Plant Academy · Lab Prep', client: 'Plant Academy', code: 'PA-LP', color: JOB_COLORS.sky, type: 'Manual Punch', kind: 'manual', location: 'Curriculum Lab, Bldg C', rate: 22.0,
     paycodes: ['Regular', 'Overtime'],
     costCenters: ['Curriculum Dev', 'Materials Prep', 'Inventory'] },
 ];

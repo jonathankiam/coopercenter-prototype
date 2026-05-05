@@ -1,8 +1,10 @@
 'use client';
 
 import { Layers } from 'lucide-react';
-import { C, FONTS } from '@/lib/design';
+import { Card } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 import StatusPill from '@/components/StatusPill';
+import { cn } from '@/lib/utils';
 import type { ClientGroup } from '@/lib/timesheet';
 
 export type ClientFilter = 'all' | string;
@@ -17,24 +19,21 @@ export default function ClientTabs({ groups, active, onChange }: ClientTabsProps
   const totalEntries = groups.reduce((s, g) => s + g.entries.length, 0);
 
   return (
-    <div
-      className="flex items-stretch gap-px rounded-2xl overflow-hidden mb-3"
-      style={{ backgroundColor: C.borderSoft, border: `1px solid ${C.border}` }}
-    >
+    <Card className="flex flex-row items-stretch gap-px overflow-hidden mb-3 p-0 bg-border">
       <TabButton
         active={active === 'all'}
         onClick={() => onChange('all')}
-        accentColor={C.ink}
+        accentColor="hsl(var(--primary))"
         title={
           <span className="flex items-center gap-2">
-            <Layers size={13} strokeWidth={2.2} />
+            <Layers className="size-3.5" />
             <span>All clients</span>
           </span>
         }
         count={totalEntries}
       />
       {groups.map((g) => {
-        const accent = g.jobs[0]?.color ?? C.muted;
+        const accent = g.jobs[0]?.color ?? 'hsl(var(--muted-foreground))';
         return (
           <TabButton
             key={g.client}
@@ -44,7 +43,7 @@ export default function ClientTabs({ groups, active, onChange }: ClientTabsProps
             title={
               <span className="flex items-center gap-2">
                 <span
-                  className="block w-2 h-2 rounded-full"
+                  className="block size-2 rounded-full"
                   style={{ backgroundColor: accent }}
                 />
                 <span>{g.client}</span>
@@ -55,7 +54,7 @@ export default function ClientTabs({ groups, active, onChange }: ClientTabsProps
           />
         );
       })}
-    </div>
+    </Card>
   );
 }
 
@@ -72,31 +71,17 @@ function TabButton({ active, onClick, title, count, accentColor, status }: TabBu
   return (
     <button
       onClick={onClick}
-      className="flex-1 px-5 py-3 text-left transition-colors relative"
-      style={{
-        backgroundColor: active ? C.cream : C.paper,
-        color: active ? C.ink : C.inkSoft,
-      }}
+      className={cn(
+        'flex-1 px-5 py-3 text-left transition-colors relative',
+        active ? 'bg-card text-foreground' : 'bg-muted/40 text-muted-foreground hover:text-foreground hover:bg-muted/70',
+      )}
     >
       <div className="flex items-center justify-between gap-3">
-        <span
-          className="text-[13px] font-medium"
-          style={{ fontFamily: FONTS.sans }}
-        >
-          {title}
-        </span>
+        <span className="text-sm font-medium">{title}</span>
         <div className="flex items-center gap-2 flex-shrink-0">
-          <span
-            className="text-[11px] tabular-nums px-1.5 py-0.5 rounded"
-            style={{
-              backgroundColor: active ? C.bone : 'transparent',
-              color: active ? C.inkSoft : C.muted,
-              fontFamily: FONTS.sans,
-              border: active ? 'none' : `1px solid ${C.borderSoft}`,
-            }}
-          >
+          <Badge variant={active ? 'secondary' : 'outline'} className="tabular-nums text-[11px]">
             {count}
-          </span>
+          </Badge>
           {status && <StatusPill status={status} />}
         </div>
       </div>

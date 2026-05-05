@@ -1,8 +1,10 @@
 'use client';
 
 import { MoreHorizontal, AlertTriangle, Lock, Plus } from 'lucide-react';
-import { C, FONTS } from '@/lib/design';
-import { dayLabel, dayNum, monthName, sameDay, isBackfilledLivePunch, computeBreakdown } from '@/lib/utils';
+import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { dayLabel, dayNum, monthName, sameDay, isBackfilledLivePunch, computeBreakdown, cn } from '@/lib/utils';
 import StatusPill from '@/components/StatusPill';
 import ManualBadge from '@/components/ManualBadge';
 import type { TimeEntry, Job } from '@/lib/types';
@@ -17,8 +19,6 @@ interface TimesheetGridProps {
   onRowMenu?: (entry: TimeEntry) => void;
 }
 
-// Column template for the spreadsheet grid. Tuned so the data rows feel dense
-// without overflow at common laptop widths (1280–1440px content area).
 const COL = '120px minmax(220px, 1.4fr) 130px 70px minmax(180px, 1fr) 110px 36px';
 
 export default function TimesheetGrid({
@@ -30,23 +30,11 @@ export default function TimesheetGrid({
   onRowMenu,
 }: TimesheetGridProps) {
   return (
-    <div
-      className="rounded-2xl overflow-hidden mb-6"
-      style={{ backgroundColor: C.cream, border: `1px solid ${C.border}` }}
-    >
+    <Card className="overflow-hidden mb-6 p-0 gap-0">
       {/* Header row */}
       <div
-        className="grid items-center px-5 py-2.5"
-        style={{
-          gridTemplateColumns: COL,
-          backgroundColor: C.bone,
-          borderBottom: `1px solid ${C.border}`,
-          color: C.muted,
-          fontFamily: FONTS.sans,
-          fontSize: 10,
-          letterSpacing: '0.18em',
-          textTransform: 'uppercase',
-        }}
+        className="grid items-center px-5 py-2.5 bg-muted border-b text-[10px] uppercase tracking-widest text-muted-foreground font-medium"
+        style={{ gridTemplateColumns: COL }}
       >
         <span>Day</span>
         <span>Job · Notes</span>
@@ -57,7 +45,6 @@ export default function TimesheetGrid({
         <span></span>
       </div>
 
-      {/* Day bands */}
       {weekDays.map((day) => (
         <DayBand
           key={day.date.toISOString()}
@@ -72,37 +59,24 @@ export default function TimesheetGrid({
 
       {/* Footer row — grand total */}
       <div
-        className="grid items-center px-5 py-3"
-        style={{
-          gridTemplateColumns: COL,
-          backgroundColor: C.ink,
-          color: C.cream,
-          borderTop: `1px solid ${C.ink}`,
-        }}
+        className="grid items-center px-5 py-3 bg-foreground text-background"
+        style={{ gridTemplateColumns: COL }}
       >
-        <span
-          className="text-[10px] uppercase tracking-[0.2em]"
-          style={{ color: C.mutedSoft, fontFamily: FONTS.sans }}
-        >
+        <span className="text-[10px] uppercase tracking-widest text-background/60 font-medium">
           Week total
         </span>
         <span></span>
         <span></span>
-        <span
-          className="text-right tabular-nums"
-          style={{ fontFamily: FONTS.mono, fontSize: 18, color: C.lime, fontWeight: 500 }}
-        >
+        <span className="text-right tabular-nums font-mono text-lg font-semibold">
           {weekTotal.toFixed(1)}h
         </span>
         <span></span>
         <span></span>
         <span></span>
       </div>
-    </div>
+    </Card>
   );
 }
-
-// ─── Day band ─── //
 
 interface DayBandProps {
   day: WeekDay;
@@ -124,39 +98,31 @@ function DayBand({ day, jobs, today, colTemplate, onAddDay, onRowMenu }: DayBand
     <div>
       {/* Day header band */}
       <div
-        className="flex items-center justify-between px-5 py-2"
-        style={{
-          backgroundColor: isToday ? '#F0EAD8' : C.paper,
-          borderBottom: `1px solid ${C.borderSoft}`,
-        }}
+        className={cn(
+          'flex items-center justify-between px-5 py-2 border-b',
+          isToday ? 'bg-accent' : 'bg-muted/30',
+        )}
       >
         <div className="flex items-baseline gap-3">
           <span
-            className="text-[11px] uppercase tracking-[0.2em]"
-            style={{ color: isToday ? C.ink : C.muted, fontFamily: FONTS.sans, fontWeight: isToday ? 600 : 500 }}
+            className={cn(
+              'text-[11px] uppercase tracking-widest',
+              isToday ? 'text-foreground font-semibold' : 'text-muted-foreground font-medium',
+            )}
           >
             {dayLabel(day.date)}
           </span>
-          <span
-            className="text-[14px] font-medium tabular-nums"
-            style={{ color: C.ink, fontFamily: FONTS.sans }}
-          >
+          <span className="text-sm font-medium tabular-nums">
             {monthName(day.date).slice(0, 3)} {dayNum(day.date)}
           </span>
           {isToday && (
-            <span
-              className="text-[9px] px-1.5 py-0.5 rounded font-medium uppercase tracking-[0.1em]"
-              style={{ backgroundColor: C.lime, color: C.ink, fontFamily: FONTS.sans }}
-            >
+            <Badge variant="default" className="uppercase tracking-wide text-[9px] h-5">
               Today
-            </span>
+            </Badge>
           )}
           {hasOTorDT && (
-            <span
-              className="flex items-center gap-1 text-[10px]"
-              style={{ color: C.amber, fontFamily: FONTS.sans }}
-            >
-              <AlertTriangle size={10} strokeWidth={2.4} />
+            <span className="flex items-center gap-1 text-[10px] text-amber-600 dark:text-amber-400">
+              <AlertTriangle className="size-3" />
               {bd.ot > 0 && `${bd.ot.toFixed(1)} OT`}
               {bd.ot > 0 && bd.dt > 0 && ' · '}
               {bd.dt > 0 && `${bd.dt.toFixed(1)} DT`}
@@ -165,44 +131,31 @@ function DayBand({ day, jobs, today, colTemplate, onAddDay, onRowMenu }: DayBand
         </div>
         <div className="flex items-center gap-3">
           <span
-            className="text-[12px] tabular-nums font-medium"
-            style={{
-              color: isEmpty ? C.mutedSoft : C.ink,
-              fontFamily: FONTS.mono,
-            }}
+            className={cn(
+              'text-xs tabular-nums font-mono font-medium',
+              isEmpty ? 'text-muted-foreground/60' : 'text-foreground',
+            )}
           >
             {isEmpty ? '— · 0.0h' : `${sorted.length} · ${bd.total.toFixed(1)}h`}
           </span>
           {onAddDay && (
-            <button
+            <Button
               onClick={() => onAddDay(day.date)}
-              className="w-6 h-6 rounded-full flex items-center justify-center transition-colors hover:bg-white/60"
-              style={{
-                backgroundColor: C.bone,
-                border: `1px solid ${C.borderSoft}`,
-                color: C.inkSoft,
-              }}
+              variant="outline"
+              size="icon"
+              className="size-6 rounded-full"
               title={`Add an entry for ${dayLabel(day.date)} ${monthName(day.date).slice(0, 3)} ${dayNum(day.date)}`}
               aria-label="Add entry"
             >
-              <Plus size={11} strokeWidth={2.5} />
-            </button>
+              <Plus className="size-3" />
+            </Button>
           )}
         </div>
       </div>
 
       {/* Entry rows */}
       {isEmpty ? (
-        <div
-          className="px-5 py-3 text-[12px]"
-          style={{
-            color: C.mutedSoft,
-            fontFamily: FONTS.sans,
-            fontStyle: 'italic',
-            backgroundColor: C.cream,
-            borderBottom: `1px solid ${C.borderSoft}`,
-          }}
-        >
+        <div className="px-5 py-3 text-xs italic text-muted-foreground/70 border-b bg-card">
           No entries logged
         </div>
       ) : (
@@ -220,8 +173,6 @@ function DayBand({ day, jobs, today, colTemplate, onAddDay, onRowMenu }: DayBand
   );
 }
 
-// ─── Entry row ─── //
-
 interface EntryRowProps {
   entry: TimeEntry;
   jobs: Job[];
@@ -238,19 +189,14 @@ function EntryRow({ entry, jobs, colTemplate, onRowMenu }: EntryRowProps) {
 
   return (
     <div
-      className="grid items-center px-5 py-2.5 transition-colors group hover:bg-white/40"
-      style={{
-        gridTemplateColumns: colTemplate,
-        borderBottom: `1px solid ${C.borderSoft}`,
-        backgroundColor: C.cream,
-        opacity: locked ? 0.85 : 1,
-      }}
+      className={cn(
+        'grid items-center px-5 py-2.5 transition-colors group hover:bg-accent/50 border-b bg-card',
+        locked && 'opacity-85',
+      )}
+      style={{ gridTemplateColumns: colTemplate }}
     >
-      {/* Day cell — subtle, since the band already shows the day */}
-      <span
-        className="text-[11px] tabular-nums"
-        style={{ color: C.mutedSoft, fontFamily: FONTS.sans }}
-      >
+      {/* Day cell */}
+      <span className="text-[11px] tabular-nums text-muted-foreground/70">
         {dayLabel(entry.date).slice(0, 3)} {monthName(entry.date).slice(0, 3)} {dayNum(entry.date)}
       </span>
 
@@ -258,26 +204,16 @@ function EntryRow({ entry, jobs, colTemplate, onRowMenu }: EntryRowProps) {
       <div className="min-w-0 flex items-center gap-2.5">
         <span
           className="block w-1 h-7 rounded-full flex-shrink-0"
-          style={{ backgroundColor: job?.color ?? C.muted }}
+          style={{ backgroundColor: job?.color }}
         />
         <div className="min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
-            <span
-              className="text-[13px] font-medium truncate"
-              style={{ color: C.ink, fontFamily: FONTS.sans }}
-            >
-              {job?.name ?? 'Unknown job'}
-            </span>
+            <span className="text-sm font-medium truncate">{job?.name ?? 'Unknown job'}</span>
             {showManual && <ManualBadge />}
-            {locked && (
-              <Lock size={10} strokeWidth={2.4} style={{ color: C.mutedSoft }} />
-            )}
+            {locked && <Lock className="size-3 text-muted-foreground/60" />}
           </div>
           {entry.note && (
-            <div
-              className="text-[11px] italic truncate mt-0.5"
-              style={{ color: C.muted, fontFamily: FONTS.sans }}
-            >
+            <div className="text-[11px] italic truncate mt-0.5 text-muted-foreground">
               &ldquo;{entry.note}&rdquo;
             </div>
           )}
@@ -285,54 +221,42 @@ function EntryRow({ entry, jobs, colTemplate, onRowMenu }: EntryRowProps) {
       </div>
 
       {/* Time range */}
-      <span
-        className="text-[12px] tabular-nums"
-        style={{ color: C.inkSoft, fontFamily: FONTS.mono }}
-      >
+      <span className="text-xs tabular-nums font-mono text-foreground/80">
         {entry.start} → {entry.end}
       </span>
 
-      {/* Hours (right aligned, mono, larger) */}
-      <span
-        className="text-[14px] tabular-nums text-right"
-        style={{ color: C.ink, fontFamily: FONTS.mono, fontWeight: 500 }}
-      >
+      {/* Hours */}
+      <span className="text-sm tabular-nums text-right font-mono font-medium">
         {entry.hours.toFixed(1)}h
       </span>
 
-      {/* Pay code · OT/DT badges */}
+      {/* Pay code · OT/DT */}
       <div className="flex items-center gap-1.5 flex-wrap min-w-0">
         {entry.paycode && (
-          <span
-            className="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded font-medium"
-            style={{ backgroundColor: C.bone, color: C.inkSoft, fontFamily: FONTS.sans }}
-          >
+          <Badge variant="secondary" className="uppercase tracking-wide text-[10px] h-5">
             {entry.paycode}
-          </span>
+          </Badge>
         )}
         {entry.costCenter && (
-          <span
-            className="text-[11px] truncate"
-            style={{ color: C.muted, fontFamily: FONTS.sans }}
-          >
+          <span className="text-[11px] truncate text-muted-foreground">
             {entry.costCenter}
           </span>
         )}
         {hasOT && (
-          <span
-            className="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded font-medium"
-            style={{ backgroundColor: '#F5E5C5', color: '#8A6420', fontFamily: FONTS.sans }}
+          <Badge
+            variant="outline"
+            className="uppercase tracking-wide text-[10px] h-5 bg-amber-50 text-amber-800 border-amber-200 dark:bg-amber-950/40 dark:text-amber-300 dark:border-amber-900/60"
           >
             +{entry.otH.toFixed(1)} OT
-          </span>
+          </Badge>
         )}
         {hasDT && (
-          <span
-            className="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded font-medium"
-            style={{ backgroundColor: '#F0CFC5', color: '#7A2A1A', fontFamily: FONTS.sans }}
+          <Badge
+            variant="outline"
+            className="uppercase tracking-wide text-[10px] h-5 bg-red-50 text-red-800 border-red-200 dark:bg-red-950/40 dark:text-red-300 dark:border-red-900/60"
           >
             +{entry.dtH.toFixed(1)} DT
-          </span>
+          </Badge>
         )}
       </div>
 
@@ -343,15 +267,16 @@ function EntryRow({ entry, jobs, colTemplate, onRowMenu }: EntryRowProps) {
 
       {/* Actions */}
       <div className="flex justify-end">
-        <button
+        <Button
           onClick={() => onRowMenu?.(entry)}
-          className="w-7 h-7 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-white/60"
-          style={{ color: C.muted }}
+          variant="ghost"
+          size="icon"
+          className="size-7 opacity-0 group-hover:opacity-100"
           aria-label="Row actions"
           disabled={locked}
         >
-          <MoreHorizontal size={14} />
-        </button>
+          <MoreHorizontal className="size-3.5" />
+        </Button>
       </div>
     </div>
   );
