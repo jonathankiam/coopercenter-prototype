@@ -116,7 +116,7 @@ export default function PreferencesCard({
         control={
           <Select
             value={prefs.defaultExpenseCategory}
-            onValueChange={(v) => onChange('defaultExpenseCategory', v)}
+            onValueChange={(v) => v && onChange('defaultExpenseCategory', v)}
           >
             <SelectTrigger className="h-8 min-w-[160px]">
               <SelectValue />

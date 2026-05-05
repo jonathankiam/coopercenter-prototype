@@ -22,8 +22,8 @@ export default function Placeholder({ title, description }: PlaceholderProps) {
           <p className="text-sm leading-relaxed text-muted-foreground mb-6">
             {description}
           </p>
-          <Button asChild>
-            <Link href="/prototype">See it in the mobile prototype</Link>
+          <Button render={<Link href="/prototype" />}>
+            See it in the mobile prototype
           </Button>
         </CardContent>
       </Card>
